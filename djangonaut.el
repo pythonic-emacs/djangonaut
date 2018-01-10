@@ -5,7 +5,7 @@
 ;; Author: Artem Malyshev <proofit404@gmail.com>
 ;; URL: https://github.com/proofit404/djangonaut
 ;; Version: 0.0.1
-;; Package-Requires: ((emacs "24") (pythonic "0.1.0") (dash "2.6.0") (s "1.9"))
+;; Package-Requires: ((emacs "24") (pythonic "0.1.0") (dash "2.13.0") (s "1.12.0") (f "0.20.0"))
 
 ;; This program is free software; you can redistribute it and/or modify
 ;; it under the terms of the GNU General Public License as published by
@@ -30,6 +30,7 @@
 (require 'json)
 (require 'dash)
 (require 's)
+(require 'f)
 
 (defvar djangonaut-get-project-root-code "
 from __future__ import print_function
@@ -146,8 +147,12 @@ print(dumps(models), end='')
 ;;;###autoload
 (define-globalized-minor-mode global-djangonaut-mode djangonaut-mode
   (lambda ()
-    (when (djangonaut-get-project-root)
-      (djangonaut-mode 1))))
+    (ignore-errors
+      (-when-let* ((project-root (djangonaut-get-project-root))
+                   (directory (pythonic-file-name default-directory))
+                   (in-project (or (f-same? project-root directory)
+                                   (f-ancestor-of? project-root directory))))
+        (djangonaut-mode 1)))))
 
 (provide 'djangonaut)
 
