@@ -5,7 +5,7 @@
 ;; Author: Artem Malyshev <proofit404@gmail.com>
 ;; URL: https://github.com/proofit404/djangonaut
 ;; Version: 0.0.1
-;; Package-Requires: ((emacs "24") (pythonic "0.1.0") (hydra "0.14.0") (dash "2.6.0") (s "1.9"))
+;; Package-Requires: ((emacs "24") (pythonic "0.1.0") (dash "2.6.0") (s "1.9"))
 
 ;; This program is free software; you can redistribute it and/or modify
 ;; it under the terms of the GNU General Public License as published by
@@ -27,10 +27,21 @@
 ;;; Code:
 
 (require 'pythonic)
-(require 'hydra)
 (require 'json)
 (require 'dash)
 (require 's)
+
+(defvar djangonaut-get-project-root-code "
+from __future__ import print_function
+from importlib import import_module
+from os import environ
+from os.path import dirname
+settings_module = environ['DJANGO_SETTINGS_MODULE']
+package_name = settings_module.split('.', 1)[0]
+package = import_module(package_name)
+project_root = dirname(dirname(package.__file__))
+print(project_root, end='')
+")
 
 (defvar djangonaut-get-commands-code "
 from __future__ import print_function
@@ -62,7 +73,12 @@ models = {model.__name__: [getfile(model), findsource(model)[1]] for model in ap
 print(dumps(models), end='')
 ")
 
-(defvar-local djangonaut-directory nil)
+(defun djangonaut-get-project-root ()
+  (with-output-to-string
+    (with-current-buffer
+        standard-output
+      (call-pythonic :buffer standard-output
+                     :args (list "-c" djangonaut-get-project-root-code)))))
 
 (defun djangonaut-get-commands ()
   (split-string
@@ -71,7 +87,7 @@ print(dumps(models), end='')
          standard-output
        (call-pythonic :buffer standard-output
                       :args (list "-c" djangonaut-get-commands-code)
-                      :cwd djangonaut-directory)))
+                      :cwd (djangonaut-get-project-root))))
    nil t))
 
 (defun djangonaut-get-app-paths ()
@@ -81,7 +97,7 @@ print(dumps(models), end='')
          standard-output
        (call-pythonic :buffer standard-output
                       :args (list "-c" djangonaut-get-app-paths-code)
-                      :cwd djangonaut-directory)))))
+                      :cwd (djangonaut-get-project-root))))))
 
 (defun djangonaut-get-models ()
   (json-read-from-string
@@ -90,7 +106,15 @@ print(dumps(models), end='')
          standard-output
        (call-pythonic :buffer standard-output
                       :args (list "-c" djangonaut-get-models-code)
-                      :cwd djangonaut-directory)))))
+                      :cwd (djangonaut-get-project-root))))))
+
+(defun djangonaut-command (&rest command)
+  (interactive (split-string (completing-read "Command: " (djangonaut-get-commands) nil nil) " " t))
+  (start-pythonic :process "djangonaut"
+                  :buffer "*Django*"
+                  :args (append (list "-m" "django") command)
+                  :cwd (djangonaut-get-project-root))
+  (pop-to-buffer "*Django*"))
 
 (defun djangonaut-find-model ()
   (interactive)
@@ -105,73 +129,9 @@ print(dumps(models), end='')
     (goto-char (point-min))
     (forward-line lineno)))
 
-(defun djangonaut-command (&rest command)
-  (interactive (split-string (completing-read "Command: " (djangonaut-get-commands) nil nil) " " t))
-  (start-pythonic :process "djangonaut"
-                  :buffer "*Django*"
-                  :args (append (list "manage.py") command)
-                  :cwd djangonaut-directory)
-  (pop-to-buffer "*Django*"))
-
-(defun djangonaut-makemigrations (app-name)
-  (interactive "sApplication: ")
-  (djangonaut-command "makemigrations" app-name))
-
-(defun djangonaut-flush ()
-  (interactive)
-  (djangonaut-command "flush" "--noinput"))
-
-(defun djangonaut-migrate ()
-  (interactive)
-  (djangonaut-command "migrate"))
-
-(defun djangonaut-assets-rebuild ()
-  (interactive)
-  (djangonaut-command "assets" "rebuild"))
-
-(defun djangonaut-startapp (name)
-  (interactive "sName:")
-  (djangonaut-command "startapp" name))
-
-(defun djangonaut-makemessages ()
-  (interactive)
-  (djangonaut-command "makemessages" "--all" "--symlinks"))
-
-(defun djangonaut-compilemessages ()
-  (interactive)
-  (djangonaut-command "compilemessages"))
-
-(defun djangonaut-test ()
-  (interactive)
-  (djangonaut-command "test"))
-
-(defhydra djangonaut-hydra (:color blue :hint nil)
-  "
-                              Manage.py
-----------------------------------------------------------------------------
-
-_mm_: Enter manage.py command   _t_: Run rest           _f_: Flush
-_ma_: Makemigrations            _sa_: Start new app     _a_: Rebuild Assets
-_mg_: Migrate                   _c_: Compile messages
-_me_: Make messages
-
-_q_: Cancel
-
-"
-  ("mm" djangonaut-command)
-  ("ma" djangonaut-makemigrations)
-  ("mg" djangonaut-migrate)
-  ("me" djangonaut-makemessages)
-  ("sa" djangonaut-startapp)
-  ("f"  djangonaut-flush)
-  ("a"  djangonaut-assets-rebuild)
-  ("c"  djangonaut-compilemessages)
-  ("t"  djangonaut-test)
-  ("q"  nil "cancel"))
-
 (defvar djangonaut-mode-map
   (let ((map (make-keymap)))
-    (define-key map (kbd "C-c r r") 'djangonaut-hydra/body)
+    (define-key map (kbd "C-c r r") 'djangonaut-command)
     (define-key map (kbd "C-c r m") 'djangonaut-find-model)
     map))
 
@@ -186,10 +146,7 @@ _q_: Cancel
 ;;;###autoload
 (define-globalized-minor-mode global-djangonaut-mode djangonaut-mode
   (lambda ()
-    (-when-let (django-project-root
-                (and (stringp buffer-file-name)
-                     (locate-dominating-file default-directory "manage.py")))
-      (setq djangonaut-directory (pythonic-file-name django-project-root))
+    (when (djangonaut-get-project-root)
       (djangonaut-mode 1))))
 
 (provide 'djangonaut)
