@@ -51,6 +51,17 @@ paths = {app.label: app.path for app in apps.get_app_configs()}
 print(dumps(paths), end='')
 ")
 
+(defvar djangonaut-get-models-code "
+from __future__ import print_function
+from inspect import findsource, getfile
+from json import dumps
+from django.apps import apps
+from django.conf import settings
+apps.populate(settings.INSTALLED_APPS)
+models = {model.__name__: [getfile(model), findsource(model)[1]] for model in apps.get_models()}
+print(dumps(models), end='')
+")
+
 (defvar-local djangonaut-directory nil)
 
 (defun djangonaut-get-commands ()
@@ -71,6 +82,28 @@ print(dumps(paths), end='')
        (call-pythonic :buffer standard-output
                       :args (list "-c" djangonaut-get-app-paths-code)
                       :cwd djangonaut-directory)))))
+
+(defun djangonaut-get-models ()
+  (json-read-from-string
+   (with-output-to-string
+     (with-current-buffer
+         standard-output
+       (call-pythonic :buffer standard-output
+                      :args (list "-c" djangonaut-get-models-code)
+                      :cwd djangonaut-directory)))))
+
+(defun djangonaut-find-model ()
+  (interactive)
+  (let* ((models (djangonaut-get-models))
+         (model (intern (completing-read "Model: " (mapcar 'symbol-name (mapcar 'car (djangonaut-get-models))) nil t)))
+         (code (cdr (assoc model models)))
+         (filename (elt code 0))
+         (lineno (elt code 1)))
+    (when (pythonic-remote-p)
+      (setq filename (concat (pythonic-tramp-connection) filename)))
+    (find-file filename)
+    (goto-char (point-min))
+    (forward-line lineno)))
 
 (defun djangonaut-command (&rest command)
   (interactive (split-string (completing-read "Command: " (djangonaut-get-commands) nil nil) " " t))
@@ -138,10 +171,11 @@ _q_: Cancel
 
 (defvar djangonaut-mode-map
   (let ((map (make-keymap)))
-    (define-key map (kbd "C-c r") 'djangonaut-hydra/body)
+    (define-key map (kbd "C-c r r") 'djangonaut-hydra/body)
+    (define-key map (kbd "C-c r m") 'djangonaut-find-model)
     map))
 
-(defvar djangonaut-mode-lighter " Djangonaut")
+(defvar djangonaut-mode-lighter " Django")
 
 ;;;###autoload
 (define-minor-mode djangonaut-mode
