@@ -37,6 +37,7 @@ from __future__ import print_function
 from importlib import import_module
 from os import environ
 from os.path import dirname
+
 settings_module = environ['DJANGO_SETTINGS_MODULE']
 package_name = settings_module.split('.', 1)[0]
 package = import_module(package_name)
@@ -46,19 +47,23 @@ print(project_root, end='')
 
 (defvar djangonaut-get-commands-code "
 from __future__ import print_function
+
 from django.apps import apps
 from django.conf import settings
-from django.core.management import get_commands
 apps.populate(settings.INSTALLED_APPS)
+
+from django.core.management import get_commands
 print('\\n'.join(get_commands().keys()))
 ")
 
 (defvar djangonaut-get-app-paths-code "
 from __future__ import print_function
 from json import dumps
+
 from django.apps import apps
 from django.conf import settings
 apps.populate(settings.INSTALLED_APPS)
+
 paths = {app.label: app.path for app in apps.get_app_configs()}
 print(dumps(paths), end='')
 ")
@@ -67,11 +72,40 @@ print(dumps(paths), end='')
 from __future__ import print_function
 from inspect import findsource, getfile
 from json import dumps
+
 from django.apps import apps
 from django.conf import settings
 apps.populate(settings.INSTALLED_APPS)
+
 models = {model.__name__: [getfile(model), findsource(model)[1]] for model in apps.get_models()}
 print(dumps(models), end='')
+")
+
+(defvar djangonaut-get-signal-receivers-code "
+from __future__ import print_function
+
+from django.apps import apps
+from django.conf import settings
+apps.populate(settings.INSTALLED_APPS)
+
+from gc import get_objects
+from inspect import findsource, getfile
+from json import dumps
+from weakref import ReferenceType
+
+from django.dispatch.dispatcher import Signal
+
+receivers = {}
+for obj in get_objects():
+    if isinstance(obj, Signal):
+        for lookup_key, receiver in obj.receivers:
+            if isinstance(receiver, ReferenceType):
+                receiver = receiver()
+                if receiver is None:
+                    continue
+            receivers[receiver.__name__] = [getfile(receiver), findsource(receiver)[1]]
+
+print(dumps(receivers), end='')
 ")
 
 (defun djangonaut-get-project-root ()
@@ -109,6 +143,15 @@ print(dumps(models), end='')
                       :args (list "-c" djangonaut-get-models-code)
                       :cwd (djangonaut-get-project-root))))))
 
+(defun djangonaut-get-signal-receivers ()
+  (json-read-from-string
+   (with-output-to-string
+     (with-current-buffer
+         standard-output
+       (call-pythonic :buffer standard-output
+                      :args (list "-c" djangonaut-get-signal-receivers-code)
+                      :cwd (djangonaut-get-project-root))))))
+
 (defun djangonaut-command (&rest command)
   (interactive (split-string (completing-read "Command: " (djangonaut-get-commands) nil nil) " " t))
   (start-pythonic :process "djangonaut"
@@ -120,8 +163,21 @@ print(dumps(models), end='')
 (defun djangonaut-find-model ()
   (interactive)
   (let* ((models (djangonaut-get-models))
-         (model (intern (completing-read "Model: " (mapcar 'symbol-name (mapcar 'car (djangonaut-get-models))) nil t)))
+         (model (intern (completing-read "Model: " (mapcar 'symbol-name (mapcar 'car models)) nil t)))
          (code (cdr (assoc model models)))
+         (filename (elt code 0))
+         (lineno (elt code 1)))
+    (when (pythonic-remote-p)
+      (setq filename (concat (pythonic-tramp-connection) filename)))
+    (find-file filename)
+    (goto-char (point-min))
+    (forward-line lineno)))
+
+(defun djangonaut-find-signal-receivers ()
+  (interactive)
+  (let* ((receivers (djangonaut-get-signal-receivers))
+         (receiver (intern (completing-read "Receiver: " (mapcar 'symbol-name (mapcar 'car receivers)) nil t)))
+         (code (cdr (assoc receiver receivers)))
          (filename (elt code 0))
          (lineno (elt code 1)))
     (when (pythonic-remote-p)
@@ -134,6 +190,7 @@ print(dumps(models), end='')
   (let ((map (make-keymap)))
     (define-key map (kbd "C-c r r") 'djangonaut-command)
     (define-key map (kbd "C-c r m") 'djangonaut-find-model)
+    (define-key map (kbd "C-c r s") 'djangonaut-find-signal-receivers)
     map))
 
 (defvar djangonaut-mode-lighter " Django")
