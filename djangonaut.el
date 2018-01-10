@@ -28,13 +28,27 @@
 
 (require 'pythonic)
 (require 'hydra)
+(require 'json)
 (require 'dash)
 (require 's)
 
 (defvar djangonaut-get-commands-code "
 from __future__ import print_function
+from django.apps import apps
+from django.conf import settings
 from django.core.management import get_commands
+apps.populate(settings.INSTALLED_APPS)
 print('\\n'.join(get_commands().keys()))
+")
+
+(defvar djangonaut-get-app-paths-code "
+from __future__ import print_function
+from json import dumps
+from django.apps import apps
+from django.conf import settings
+apps.populate(settings.INSTALLED_APPS)
+paths = {app.label: app.path for app in apps.get_app_configs()}
+print(dumps(paths), end='')
 ")
 
 (defvar-local djangonaut-directory nil)
@@ -48,6 +62,15 @@ print('\\n'.join(get_commands().keys()))
                       :args (list "-c" djangonaut-get-commands-code)
                       :cwd djangonaut-directory)))
    nil t))
+
+(defun djangonaut-get-app-paths ()
+  (json-read-from-string
+   (with-output-to-string
+     (with-current-buffer
+         standard-output
+       (call-pythonic :buffer standard-output
+                      :args (list "-c" djangonaut-get-app-paths-code)
+                      :cwd djangonaut-directory)))))
 
 (defun djangonaut-command (&rest command)
   (interactive (split-string (completing-read "Command: " (djangonaut-get-commands) nil nil) " " t))
