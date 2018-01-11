@@ -32,6 +32,12 @@
 (require 's)
 (require 'f)
 
+(defvar djangonaut-get-pythonpath-code "
+from __future__ import print_function
+from sys import path
+print('\\n'.join(path))
+")
+
 (defvar djangonaut-get-project-root-code "
 from __future__ import print_function
 from importlib import import_module
@@ -107,6 +113,15 @@ for obj in get_objects():
 
 print(dumps(receivers), end='')
 ")
+
+(defun djangonaut-get-pythonpath ()
+  (split-string
+   (with-output-to-string
+     (with-current-buffer
+         standard-output
+       (call-pythonic :buffer standard-output
+                      :args (list "-c" djangonaut-get-pythonpath-code))))
+   nil t))
 
 (defun djangonaut-get-project-root ()
   (with-output-to-string
@@ -215,11 +230,12 @@ print(dumps(receivers), end='')
 (define-globalized-minor-mode global-djangonaut-mode djangonaut-mode
   (lambda ()
     (ignore-errors
-      (-when-let* ((project-root (djangonaut-get-project-root))
-                   (directory (pythonic-file-name default-directory))
-                   (in-project (or (f-same? project-root directory)
-                                   (f-ancestor-of? project-root directory))))
-        (djangonaut-mode 1)))))
+      (when (djangonaut-get-project-root)
+        (let ((directory (pythonic-file-name default-directory)))
+          (dolist (path (djangonaut-get-pythonpath))
+            (when (or (f-same? path directory)
+                      (f-ancestor-of? path directory))
+              (djangonaut-mode 1))))))))
 
 (provide 'djangonaut)
 
