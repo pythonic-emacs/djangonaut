@@ -152,7 +152,7 @@ print(dumps(receivers), end='')
                       :args (list "-c" djangonaut-get-signal-receivers-code)
                       :cwd (djangonaut-get-project-root))))))
 
-(defun djangonaut-command (&rest command)
+(defun djangonaut-management-command (&rest command)
   (interactive (split-string (completing-read "Command: " (djangonaut-get-commands) nil nil) " " t))
   (start-pythonic :process "djangonaut"
                   :buffer "*Django*"
@@ -188,9 +188,9 @@ print(dumps(receivers), end='')
 
 (defvar djangonaut-mode-map
   (let ((map (make-keymap)))
-    (define-key map (kbd "C-c r r") 'djangonaut-command)
+    (define-key map (kbd "C-c r !") 'djangonaut-management-command)
     (define-key map (kbd "C-c r m") 'djangonaut-find-model)
-    (define-key map (kbd "C-c r s") 'djangonaut-find-signal-receivers)
+    (define-key map (kbd "C-c r r") 'djangonaut-find-signal-receivers)
     map))
 
 (defvar djangonaut-mode-lighter " Django")
