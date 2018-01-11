@@ -186,11 +186,21 @@ print(dumps(receivers), end='')
     (goto-char (point-min))
     (forward-line lineno)))
 
+(defun djangonaut-dired-installed-apps ()
+  (interactive)
+  (let* ((apps (djangonaut-get-app-paths))
+         (app (intern (completing-read "App: " (mapcar 'symbol-name (mapcar 'car apps)) nil t)))
+         (directory (cdr (assoc app apps))))
+    (when (pythonic-remote-p)
+      (setq directory (concat (pythonic-tramp-connection) directory)))
+    (dired directory)))
+
 (defvar djangonaut-mode-map
   (let ((map (make-keymap)))
     (define-key map (kbd "C-c r !") 'djangonaut-management-command)
     (define-key map (kbd "C-c r m") 'djangonaut-find-model)
     (define-key map (kbd "C-c r r") 'djangonaut-find-signal-receivers)
+    (define-key map (kbd "C-c r i") 'djangonaut-dired-installed-apps)
     map))
 
 (defvar djangonaut-mode-lighter " Django")
