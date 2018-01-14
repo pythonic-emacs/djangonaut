@@ -138,6 +138,32 @@ for obj in get_objects():
 print(dumps(serializers), end='')
 ")
 
+(defvar djangonaut-get-views-code "
+from __future__ import print_function
+
+from django.apps import apps
+from django.conf import settings
+apps.populate(settings.INSTALLED_APPS)
+
+from inspect import findsource, getfile
+from json import dumps
+
+from django.urls import get_resolver, get_urlconf, RegexURLPattern, RegexURLResolver
+
+views = {}
+
+def collect_views(resolver):
+    for pattern in resolver.url_patterns:
+        if isinstance(pattern, RegexURLResolver):
+            collect_views(pattern)
+        elif isinstance(pattern, RegexURLPattern):
+            views[pattern.callback.__name__] = [getfile(pattern.callback), findsource(pattern.callback)[1]]
+
+collect_views(get_resolver(get_urlconf()))
+
+print(dumps(views), end='')
+")
+
 (defun djangonaut-get-pythonpath ()
   (split-string
    (with-output-to-string
@@ -200,6 +226,15 @@ print(dumps(serializers), end='')
                       :args (list "-c" djangonaut-get-drf-serializers-code)
                       :cwd (djangonaut-get-project-root))))))
 
+(defun djangonaut-get-views ()
+  (json-read-from-string
+   (with-output-to-string
+     (with-current-buffer
+         standard-output
+       (call-pythonic :buffer standard-output
+                      :args (list "-c" djangonaut-get-views-code)
+                      :cwd (djangonaut-get-project-root))))))
+
 (defun djangonaut-management-command (&rest command)
   (interactive (split-string (completing-read "Command: " (djangonaut-get-commands) nil nil) " " t))
   (start-pythonic :process "djangonaut"
@@ -247,6 +282,19 @@ print(dumps(serializers), end='')
     (goto-char (point-min))
     (forward-line lineno)))
 
+(defun djangonaut-find-view ()
+  (interactive)
+  (let* ((views (djangonaut-get-views))
+         (view (intern (completing-read "View: " (mapcar 'symbol-name (mapcar 'car views)) nil t)))
+         (code (cdr (assoc view views)))
+         (filename (elt code 0))
+         (lineno (elt code 1)))
+    (when (pythonic-remote-p)
+      (setq filename (concat (pythonic-tramp-connection) filename)))
+    (find-file filename)
+    (goto-char (point-min))
+    (forward-line lineno)))
+
 (defun djangonaut-dired-installed-apps ()
   (interactive)
   (let* ((apps (djangonaut-get-app-paths))
@@ -262,6 +310,7 @@ print(dumps(serializers), end='')
     (define-key map (kbd "C-c r m") 'djangonaut-find-model)
     (define-key map (kbd "C-c r r") 'djangonaut-find-signal-receiver)
     (define-key map (kbd "C-c r s") 'djangonaut-find-drf-serializer)
+    (define-key map (kbd "C-c r v") 'djangonaut-find-view)
     (define-key map (kbd "C-c r i") 'djangonaut-dired-installed-apps)
     map))
 
