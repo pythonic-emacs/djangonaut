@@ -5,7 +5,7 @@
 ;; Author: Artem Malyshev <proofit404@gmail.com>
 ;; URL: https://github.com/proofit404/djangonaut
 ;; Version: 0.0.1
-;; Package-Requires: ((emacs "24") (pythonic "0.1.0") (dash "2.13.0") (s "1.12.0") (f "0.20.0"))
+;; Package-Requires: ((emacs "24") (pythonic "0.1.0") (f "0.20.0"))
 
 ;; This program is free software; you can redistribute it and/or modify
 ;; it under the terms of the GNU General Public License as published by
@@ -28,8 +28,6 @@
 
 (require 'pythonic)
 (require 'json)
-(require 'dash)
-(require 's)
 (require 'f)
 
 (defvar djangonaut-get-pythonpath-code "
