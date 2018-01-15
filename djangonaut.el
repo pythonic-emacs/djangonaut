@@ -143,7 +143,7 @@ from django.apps import apps
 from django.conf import settings
 apps.populate(settings.INSTALLED_APPS)
 
-from inspect import findsource, getfile, unwrap
+from inspect import findsource, getfile, getmodule, ismethod, unwrap
 from json import dumps
 
 from django.urls import get_resolver, get_urlconf, RegexURLPattern, RegexURLResolver
@@ -155,8 +155,22 @@ def collect_views(resolver):
         if isinstance(pattern, RegexURLResolver):
             collect_views(pattern)
         elif isinstance(pattern, RegexURLPattern):
-            view = unwrap(pattern.callback)
-            views[pattern.callback.__name__] = [getfile(view), findsource(view)[1]]
+            view = pattern.callback
+            if hasattr(view, 'view_class'):
+                # Django as_view result.
+                view = view.view_class
+                name = getmodule(view).__name__ + '.' + view.__name__
+            elif hasattr(view, 'cls'):
+                # DRF as_view result.
+                view = view.cls
+                name = getmodule(view).__name__ + '.' + view.__name__
+            else:
+                view = unwrap(view)
+                if ismethod(view):
+                    name = getmodule(view).__name__ + '.' + view.__self__.__class__.__name__ + '.' + view.__name__
+                else:
+                    name = getmodule(view).__name__ + '.' + view.__name__
+            views[name] = [getfile(view), findsource(view)[1]]
 
 collect_views(get_resolver(get_urlconf()))
 
