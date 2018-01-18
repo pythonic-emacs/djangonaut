@@ -81,7 +81,7 @@ from django.apps import apps
 from django.conf import settings
 apps.populate(settings.INSTALLED_APPS)
 
-models = {model.__name__: [getfile(model), findsource(model)[1]] for model in apps.get_models()}
+models = {model._meta.app_label + '.' + model.__name__: [getfile(model), findsource(model)[1]] for model in apps.get_models()}
 print(dumps(models), end='')
 ")
 
