@@ -177,6 +177,37 @@ collect_views(get_resolver(get_urlconf()))
 print(dumps(views), end='')
 ")
 
+(defvar djangonaut-get-templates-code "
+from __future__ import print_function
+
+from django.apps import apps
+from django.conf import settings
+apps.populate(settings.INSTALLED_APPS)
+
+from json import dumps
+from os import walk
+from os.path import join
+
+from django.template import engines
+from django.template.backends.django import DjangoTemplates
+from django.template.loaders.filesystem import Loader as FileSystemLoader
+from django.template.loaders.app_directories import Loader as AppDirectoriesLoader
+
+templates = {}
+
+for engine in engines.all():
+    if isinstance(engine, DjangoTemplates):
+        for loader in engine.engine.template_loaders:
+            if isinstance(loader, (FileSystemLoader, AppDirectoriesLoader)):
+                for template_directory in loader.get_dirs():
+                    for root, _, files in walk(template_directory):
+                        for template in files:
+                            template_path = join(root, template)
+                            templates.setdefault(template_path[len(template_directory) + 1:], template_path)
+
+print(dumps(templates), end='')
+")
+
 (defvar djangonaut-get-settings-path-code "
 from __future__ import print_function
 from importlib import import_module
@@ -259,6 +290,15 @@ print(settings_path, end='')
                       :args (list "-c" djangonaut-get-views-code)
                       :cwd (djangonaut-get-project-root))))))
 
+(defun djangonaut-get-templates ()
+  (json-read-from-string
+   (with-output-to-string
+     (with-current-buffer
+         standard-output
+       (call-pythonic :buffer standard-output
+                      :args (list "-c" djangonaut-get-templates-code)
+                      :cwd (djangonaut-get-project-root))))))
+
 (defun djangonaut-get-settings-path ()
   (with-output-to-string
     (with-current-buffer
@@ -335,6 +375,15 @@ print(settings_path, end='')
     (goto-char (point-min))
     (forward-line lineno)))
 
+(defun djangonaut-find-template ()
+  (interactive)
+  (let* ((templates (djangonaut-get-templates))
+         (template (intern (completing-read "Template: " (mapcar 'symbol-name (mapcar 'car templates)) nil t)))
+         (filename (cdr (assoc template templates))))
+    (when (pythonic-remote-p)
+      (setq filename (concat (pythonic-tramp-connection) filename)))
+    (find-file filename)))
+
 (defun djangonaut-find-settings-module ()
   (interactive)
   (let ((filename (djangonaut-get-settings-path)))
@@ -350,6 +399,7 @@ print(settings_path, end='')
     (define-key map (kbd "C-c r r") 'djangonaut-find-signal-receiver)
     (define-key map (kbd "C-c r s") 'djangonaut-find-drf-serializer)
     (define-key map (kbd "C-c r v") 'djangonaut-find-view)
+    (define-key map (kbd "C-c r t") 'djangonaut-find-template)
     (define-key map (kbd "C-c r S") 'djangonaut-find-settings-module)
     map))
 
