@@ -177,6 +177,17 @@ collect_views(get_resolver(get_urlconf()))
 print(dumps(views), end='')
 ")
 
+(defvar djangonaut-get-settings-path-code "
+from __future__ import print_function
+from importlib import import_module
+from os import environ
+
+settings_module = environ['DJANGO_SETTINGS_MODULE']
+module = import_module(settings_module)
+settings_path = module.__file__
+print(settings_path, end='')
+")
+
 (defun djangonaut-get-pythonpath ()
   (split-string
    (with-output-to-string
@@ -248,6 +259,13 @@ print(dumps(views), end='')
                       :args (list "-c" djangonaut-get-views-code)
                       :cwd (djangonaut-get-project-root))))))
 
+(defun djangonaut-get-settings-path ()
+  (with-output-to-string
+    (with-current-buffer
+        standard-output
+      (call-pythonic :buffer standard-output
+                     :args (list "-c" djangonaut-get-settings-path-code)))))
+
 (defun djangonaut-management-command (&rest command)
   (interactive (split-string (completing-read "Command: " (djangonaut-get-commands) nil nil) " " t))
   (start-pythonic :process "djangonaut"
@@ -317,6 +335,13 @@ print(dumps(views), end='')
     (goto-char (point-min))
     (forward-line lineno)))
 
+(defun djangonaut-find-settings-module ()
+  (interactive)
+  (let ((filename (djangonaut-get-settings-path)))
+    (when (pythonic-remote-p)
+      (setq filename (concat (pythonic-tramp-connection) filename)))
+    (find-file filename)))
+
 (defvar djangonaut-mode-map
   (let ((map (make-keymap)))
     (define-key map (kbd "C-c r !") 'djangonaut-management-command)
@@ -325,6 +350,7 @@ print(dumps(views), end='')
     (define-key map (kbd "C-c r r") 'djangonaut-find-signal-receiver)
     (define-key map (kbd "C-c r s") 'djangonaut-find-drf-serializer)
     (define-key map (kbd "C-c r v") 'djangonaut-find-view)
+    (define-key map (kbd "C-c r S") 'djangonaut-find-settings-module)
     map))
 
 (defvar djangonaut-mode-lighter " Django")
