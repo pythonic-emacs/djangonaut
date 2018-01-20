@@ -72,6 +72,27 @@ paths = {app.label: app.path for app in apps.get_app_configs()}
 print(dumps(paths), end='')
 ")
 
+(defvar djangonaut-get-admin-classes-code "
+from __future__ import print_function
+
+from django.apps import apps
+from django.conf import settings
+apps.populate(settings.INSTALLED_APPS)
+
+from inspect import findsource, getfile
+from json import dumps
+
+from django.contrib.admin.sites import all_sites
+
+admin_classes = {}
+for site in all_sites:
+    for admin_instance in site._registry.values():
+        admin_class = admin_instance.__class__
+        admin_classes[admin_class.__name__] = [getfile(admin_class), findsource(admin_class)[1]]
+
+print(dumps(admin_classes), end='')
+")
+
 (defvar djangonaut-get-models-code "
 from __future__ import print_function
 from inspect import findsource, getfile
@@ -254,8 +275,17 @@ print(settings_path, end='')
                       :args (list "-c" djangonaut-get-app-paths-code)
                       :cwd (djangonaut-get-project-root))))))
 
-(defun djangonaut-get-models ()
+(defun djangonaut-get-admin-classes ()
   (json-read-from-string
+   (with-output-to-string
+     (with-current-buffer
+         standard-output
+       (call-pythonic :buffer standard-output
+                      :args (list "-c" djangonaut-get-admin-classes-code)
+                      :cwd (djangonaut-get-project-root))))))
+
+(defun djangonaut-get-models ()
+ (json-read-from-string
    (with-output-to-string
      (with-current-buffer
          standard-output
@@ -322,6 +352,19 @@ print(settings_path, end='')
     (when (pythonic-remote-p)
       (setq directory (concat (pythonic-tramp-connection) directory)))
     (dired directory)))
+
+(defun djangonaut-find-admin-class ()
+  (interactive)
+  (let* ((admin-classes (djangonaut-get-admin-classes))
+         (admin-class (intern (completing-read "Admin-Class: " (mapcar 'symbol-name (mapcar 'car admin-classes)) nil t)))
+         (code (cdr (assoc admin-class admin-classes)))
+         (filename (elt code 0))
+         (lineno (elt code 1)))
+    (when (pythonic-remote-p)
+      (setq filename (concat (pythonic-tramp-connection) filename)))
+    (find-file filename)
+    (goto-char (point-min))
+    (forward-line lineno)))
 
 (defun djangonaut-find-model ()
   (interactive)
@@ -395,6 +438,7 @@ print(settings_path, end='')
   (let ((map (make-keymap)))
     (define-key map (kbd "C-c r !") 'djangonaut-management-command)
     (define-key map (kbd "C-c r i") 'djangonaut-dired-installed-apps)
+    (define-key map (kbd "C-c r a") 'djangonaut-find-admin-class)
     (define-key map (kbd "C-c r m") 'djangonaut-find-model)
     (define-key map (kbd "C-c r r") 'djangonaut-find-signal-receiver)
     (define-key map (kbd "C-c r s") 'djangonaut-find-drf-serializer)
