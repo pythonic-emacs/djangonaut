@@ -262,8 +262,7 @@ print(settings_path, end='')
      (with-current-buffer
          standard-output
        (call-pythonic :buffer standard-output
-                      :args (list "-c" djangonaut-get-commands-code)
-                      :cwd (djangonaut-get-project-root))))
+                      :args (list "-c" djangonaut-get-commands-code))))
    nil t))
 
 (defun djangonaut-get-app-paths ()
@@ -272,8 +271,7 @@ print(settings_path, end='')
      (with-current-buffer
          standard-output
        (call-pythonic :buffer standard-output
-                      :args (list "-c" djangonaut-get-app-paths-code)
-                      :cwd (djangonaut-get-project-root))))))
+                      :args (list "-c" djangonaut-get-app-paths-code))))))
 
 (defun djangonaut-get-admin-classes ()
   (json-read-from-string
@@ -281,17 +279,15 @@ print(settings_path, end='')
      (with-current-buffer
          standard-output
        (call-pythonic :buffer standard-output
-                      :args (list "-c" djangonaut-get-admin-classes-code)
-                      :cwd (djangonaut-get-project-root))))))
+                      :args (list "-c" djangonaut-get-admin-classes-code))))))
 
 (defun djangonaut-get-models ()
- (json-read-from-string
+  (json-read-from-string
    (with-output-to-string
      (with-current-buffer
          standard-output
        (call-pythonic :buffer standard-output
-                      :args (list "-c" djangonaut-get-models-code)
-                      :cwd (djangonaut-get-project-root))))))
+                      :args (list "-c" djangonaut-get-models-code))))))
 
 (defun djangonaut-get-signal-receivers ()
   (json-read-from-string
@@ -299,8 +295,7 @@ print(settings_path, end='')
      (with-current-buffer
          standard-output
        (call-pythonic :buffer standard-output
-                      :args (list "-c" djangonaut-get-signal-receivers-code)
-                      :cwd (djangonaut-get-project-root))))))
+                      :args (list "-c" djangonaut-get-signal-receivers-code))))))
 
 (defun djangonaut-get-drf-serializers ()
   (json-read-from-string
@@ -308,8 +303,7 @@ print(settings_path, end='')
      (with-current-buffer
          standard-output
        (call-pythonic :buffer standard-output
-                      :args (list "-c" djangonaut-get-drf-serializers-code)
-                      :cwd (djangonaut-get-project-root))))))
+                      :args (list "-c" djangonaut-get-drf-serializers-code))))))
 
 (defun djangonaut-get-views ()
   (json-read-from-string
@@ -317,8 +311,7 @@ print(settings_path, end='')
      (with-current-buffer
          standard-output
        (call-pythonic :buffer standard-output
-                      :args (list "-c" djangonaut-get-views-code)
-                      :cwd (djangonaut-get-project-root))))))
+                      :args (list "-c" djangonaut-get-views-code))))))
 
 (defun djangonaut-get-templates ()
   (json-read-from-string
@@ -326,8 +319,7 @@ print(settings_path, end='')
      (with-current-buffer
          standard-output
        (call-pythonic :buffer standard-output
-                      :args (list "-c" djangonaut-get-templates-code)
-                      :cwd (djangonaut-get-project-root))))))
+                      :args (list "-c" djangonaut-get-templates-code))))))
 
 (defun djangonaut-get-settings-path ()
   (with-output-to-string
