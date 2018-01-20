@@ -240,7 +240,10 @@ from gc import get_objects
 from inspect import findsource, getfile, unwrap
 from json import dumps
 
+from django.template.backends.django import get_installed_libraries
 from django.template.library import Library
+
+get_installed_libraries()
 
 template_tags = {}
 for obj in get_objects():
@@ -263,7 +266,10 @@ from gc import get_objects
 from inspect import findsource, getfile, unwrap
 from json import dumps
 
+from django.template.backends.django import get_installed_libraries
 from django.template.library import Library
+
+get_installed_libraries()
 
 template_filters = {}
 for obj in get_objects():
