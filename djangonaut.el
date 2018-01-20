@@ -229,6 +229,52 @@ for engine in engines.all():
 print(dumps(templates), end='')
 ")
 
+(defvar djangonaut-get-template-tags-code "
+from __future__ import print_function
+
+from django.apps import apps
+from django.conf import settings
+apps.populate(settings.INSTALLED_APPS)
+
+from gc import get_objects
+from inspect import findsource, getfile, unwrap
+from json import dumps
+
+from django.template.library import Library
+
+template_tags = {}
+for obj in get_objects():
+    if isinstance(obj, Library):
+        for tag_name, tag in obj.tags.items():
+            tag = unwrap(tag)
+            template_tags[tag_name] = [getfile(tag), findsource(tag)[1]]
+
+print(dumps(template_tags), end='')
+")
+
+(defvar djangonaut-get-template-filters-code "
+from __future__ import print_function
+
+from django.apps import apps
+from django.conf import settings
+apps.populate(settings.INSTALLED_APPS)
+
+from gc import get_objects
+from inspect import findsource, getfile, unwrap
+from json import dumps
+
+from django.template.library import Library
+
+template_filters = {}
+for obj in get_objects():
+    if isinstance(obj, Library):
+        for filter_name, filter in obj.filters.items():
+            filter = unwrap(filter)
+            template_filters[filter_name] = [getfile(filter), findsource(filter)[1]]
+
+print(dumps(template_filters), end='')
+")
+
 (defvar djangonaut-get-settings-path-code "
 from __future__ import print_function
 from importlib import import_module
@@ -297,6 +343,12 @@ print(settings_path, end='')
 
 (defun djangonaut-get-templates ()
   (json-read-from-string (djangonaut-call djangonaut-get-templates-code)))
+
+(defun djangonaut-get-template-tags ()
+  (json-read-from-string (djangonaut-call djangonaut-get-template-tags-code)))
+
+(defun djangonaut-get-template-filters ()
+  (json-read-from-string (djangonaut-call djangonaut-get-template-filters-code)))
 
 (defun djangonaut-get-settings-path ()
   (djangonaut-call djangonaut-get-settings-path-code))
@@ -392,6 +444,32 @@ print(settings_path, end='')
       (setq filename (concat (pythonic-tramp-connection) filename)))
     (find-file filename)))
 
+(defun djangonaut-find-template-tag ()
+  (interactive)
+  (let* ((tags (djangonaut-get-template-tags))
+         (tag (intern (completing-read "Template Tag: " (mapcar 'symbol-name (mapcar 'car tags)) nil t)))
+         (code (cdr (assoc tag tags)))
+         (filename (elt code 0))
+         (lineno (elt code 1)))
+    (when (pythonic-remote-p)
+      (setq filename (concat (pythonic-tramp-connection) filename)))
+    (find-file filename)
+    (goto-char (point-min))
+    (forward-line lineno)))
+
+(defun djangonaut-find-template-filter ()
+  (interactive)
+  (let* ((filters (djangonaut-get-template-filters))
+         (filter (intern (completing-read "Template Filter: " (mapcar 'symbol-name (mapcar 'car filters)) nil t)))
+         (code (cdr (assoc filter filters)))
+         (filename (elt code 0))
+         (lineno (elt code 1)))
+    (when (pythonic-remote-p)
+      (setq filename (concat (pythonic-tramp-connection) filename)))
+    (find-file filename)
+    (goto-char (point-min))
+    (forward-line lineno)))
+
 (defun djangonaut-find-settings-module ()
   (interactive)
   (let ((filename (djangonaut-get-settings-path)))
@@ -409,6 +487,8 @@ print(settings_path, end='')
     (define-key map (kbd "C-c r s") 'djangonaut-find-drf-serializer)
     (define-key map (kbd "C-c r v") 'djangonaut-find-view)
     (define-key map (kbd "C-c r t") 'djangonaut-find-template)
+    (define-key map (kbd "C-c r g") 'djangonaut-find-template-tag)
+    (define-key map (kbd "C-c r f") 'djangonaut-find-template-filter)
     (define-key map (kbd "C-c r S") 'djangonaut-find-settings-module)
     map))
 
