@@ -236,21 +236,21 @@ from django.apps import apps
 from django.conf import settings
 apps.populate(settings.INSTALLED_APPS)
 
-from gc import get_objects
+from importlib import import_module
 from inspect import findsource, getfile, unwrap
 from json import dumps
 
 from django.template.backends.django import get_installed_libraries
-from django.template.library import Library
 
-get_installed_libraries()
+libraries = get_installed_libraries()
+libraries['builtin'] = 'django.template.defaulttags'
 
 template_tags = {}
-for obj in get_objects():
-    if isinstance(obj, Library):
-        for tag_name, tag in obj.tags.items():
-            tag = unwrap(tag)
-            template_tags[tag_name] = [getfile(tag), findsource(tag)[1]]
+for library_name, library_path in libraries.items():
+    library = import_module(library_path).register
+    for tag_name, tag in library.tags.items():
+        tag = unwrap(tag)
+        template_tags[library_name + '.' + tag_name] = [getfile(tag), findsource(tag)[1]]
 
 print(dumps(template_tags), end='')
 ")
@@ -262,21 +262,21 @@ from django.apps import apps
 from django.conf import settings
 apps.populate(settings.INSTALLED_APPS)
 
-from gc import get_objects
+from importlib import import_module
 from inspect import findsource, getfile, unwrap
 from json import dumps
 
 from django.template.backends.django import get_installed_libraries
-from django.template.library import Library
 
-get_installed_libraries()
+libraries = get_installed_libraries()
+libraries['builtin'] = 'django.template.defaultfilters'
 
 template_filters = {}
-for obj in get_objects():
-    if isinstance(obj, Library):
-        for filter_name, filter in obj.filters.items():
-            filter = unwrap(filter)
-            template_filters[filter_name] = [getfile(filter), findsource(filter)[1]]
+for library_name, library_path in libraries.items():
+    library = import_module(library_path).register
+    for filter_name, filter in library.filters.items():
+        filter = unwrap(filter)
+        template_filters[library_name + '.' + filter_name] = [getfile(filter), findsource(filter)[1]]
 
 print(dumps(template_filters), end='')
 ")
