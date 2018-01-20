@@ -256,77 +256,50 @@ print(settings_path, end='')
       (call-pythonic :buffer standard-output
                      :args (list "-c" djangonaut-get-project-root-code)))))
 
+(defun djangonaut-call (code)
+  (let (exit-code output)
+    (setq output
+          (with-output-to-string
+            (with-current-buffer
+                standard-output
+              (setq exit-code
+                    (call-pythonic :buffer standard-output :args (list "-c" code))))))
+    (when (not (zerop exit-code))
+      (with-current-buffer (get-buffer-create "*Django*")
+        (erase-buffer)
+        (fundamental-mode)
+        (insert output)
+        (goto-char (point-min))
+        (pop-to-buffer "*Django*")
+        (error "Python exit with status code %d" exit-code)))
+    output))
+
 (defun djangonaut-get-commands ()
-  (split-string
-   (with-output-to-string
-     (with-current-buffer
-         standard-output
-       (call-pythonic :buffer standard-output
-                      :args (list "-c" djangonaut-get-commands-code))))
-   nil t))
+  (split-string (djangonaut-call djangonaut-get-commands-code) nil t))
 
 (defun djangonaut-get-app-paths ()
-  (json-read-from-string
-   (with-output-to-string
-     (with-current-buffer
-         standard-output
-       (call-pythonic :buffer standard-output
-                      :args (list "-c" djangonaut-get-app-paths-code))))))
+  (json-read-from-string (djangonaut-call djangonaut-get-app-paths-code)))
 
 (defun djangonaut-get-admin-classes ()
-  (json-read-from-string
-   (with-output-to-string
-     (with-current-buffer
-         standard-output
-       (call-pythonic :buffer standard-output
-                      :args (list "-c" djangonaut-get-admin-classes-code))))))
+  (json-read-from-string (djangonaut-call djangonaut-get-admin-classes-code)))
 
 (defun djangonaut-get-models ()
-  (json-read-from-string
-   (with-output-to-string
-     (with-current-buffer
-         standard-output
-       (call-pythonic :buffer standard-output
-                      :args (list "-c" djangonaut-get-models-code))))))
+  (json-read-from-string (djangonaut-call djangonaut-get-models-code)))
 
 (defun djangonaut-get-signal-receivers ()
-  (json-read-from-string
-   (with-output-to-string
-     (with-current-buffer
-         standard-output
-       (call-pythonic :buffer standard-output
-                      :args (list "-c" djangonaut-get-signal-receivers-code))))))
+  (json-read-from-string (djangonaut-call djangonaut-get-signal-receivers-code)))
 
 (defun djangonaut-get-drf-serializers ()
-  (json-read-from-string
-   (with-output-to-string
-     (with-current-buffer
-         standard-output
-       (call-pythonic :buffer standard-output
-                      :args (list "-c" djangonaut-get-drf-serializers-code))))))
+  (json-read-from-string (djangonaut-call djangonaut-get-drf-serializers-code)))
 
 (defun djangonaut-get-views ()
-  (json-read-from-string
-   (with-output-to-string
-     (with-current-buffer
-         standard-output
-       (call-pythonic :buffer standard-output
-                      :args (list "-c" djangonaut-get-views-code))))))
+  (json-read-from-string (djangonaut-call djangonaut-get-views-code)))
 
 (defun djangonaut-get-templates ()
-  (json-read-from-string
-   (with-output-to-string
-     (with-current-buffer
-         standard-output
-       (call-pythonic :buffer standard-output
-                      :args (list "-c" djangonaut-get-templates-code))))))
+  (json-read-from-string (djangonaut-call djangonaut-get-templates-code)))
 
 (defun djangonaut-get-settings-path ()
-  (with-output-to-string
-    (with-current-buffer
-        standard-output
-      (call-pythonic :buffer standard-output
-                     :args (list "-c" djangonaut-get-settings-path-code)))))
+  (djangonaut-call djangonaut-get-settings-path-code))
 
 (defun djangonaut-management-command (&rest command)
   (interactive (split-string (completing-read "Command: " (djangonaut-get-commands) nil nil) " " t))
