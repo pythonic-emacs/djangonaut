@@ -281,6 +281,27 @@ for library_name, library_path in libraries.items():
 print(dumps(template_filters), end='')
 ")
 
+(defvar djangonaut-get-static-files-code "
+from __future__ import print_function
+
+from django.apps import apps
+from django.conf import settings
+apps.populate(settings.INSTALLED_APPS)
+
+from json import dumps
+
+from django.contrib.staticfiles.finders import get_finders
+
+ignore_patterns = list(set(apps.get_app_config('staticfiles').ignore_patterns))
+
+staticfiles = {}
+for finder in get_finders():
+    for path, storage in finder.list(ignore_patterns):
+        staticfiles.setdefault(path, storage.path(path))
+
+print(dumps(staticfiles), end='')
+")
+
 (defvar djangonaut-get-settings-path-code "
 from __future__ import print_function
 from importlib import import_module
@@ -355,6 +376,9 @@ print(settings_path, end='')
 
 (defun djangonaut-get-template-filters ()
   (json-read-from-string (djangonaut-call djangonaut-get-template-filters-code)))
+
+(defun djangonaut-get-static-files ()
+  (json-read-from-string (djangonaut-call djangonaut-get-static-files-code)))
 
 (defun djangonaut-get-settings-path ()
   (djangonaut-call djangonaut-get-settings-path-code))
@@ -476,6 +500,15 @@ print(settings_path, end='')
     (goto-char (point-min))
     (forward-line lineno)))
 
+(defun djangonaut-find-static-file ()
+  (interactive)
+  (let* ((static-files (djangonaut-get-static-files))
+         (static-file (intern (completing-read "Static: " (mapcar 'symbol-name (mapcar 'car static-files)) nil t)))
+         (filename (cdr (assoc static-file static-files))))
+    (when (pythonic-remote-p)
+      (setq filename (concat (pythonic-tramp-connection) filename)))
+    (find-file filename)))
+
 (defun djangonaut-find-settings-module ()
   (interactive)
   (let ((filename (djangonaut-get-settings-path)))
@@ -495,6 +528,7 @@ print(settings_path, end='')
     (define-key map (kbd "C-c r t") 'djangonaut-find-template)
     (define-key map (kbd "C-c r g") 'djangonaut-find-template-tag)
     (define-key map (kbd "C-c r f") 'djangonaut-find-template-filter)
+    (define-key map (kbd "C-c r j") 'djangonaut-find-static-file)
     (define-key map (kbd "C-c r S") 'djangonaut-find-settings-module)
     map))
 
