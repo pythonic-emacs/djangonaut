@@ -383,13 +383,16 @@ print(settings_path, end='')
 (defun djangonaut-get-settings-path ()
   (djangonaut-call djangonaut-get-settings-path-code))
 
-(defun djangonaut-management-command (&rest command)
+(defun djangonaut-run-management-command (&rest command)
   (interactive (split-string (completing-read "Command: " (djangonaut-get-commands) nil nil) " " t))
-  (start-pythonic :process "djangonaut"
-                  :buffer "*Django*"
-                  :args (append (list "-m" "django") command)
-                  :cwd (djangonaut-get-project-root))
-  (pop-to-buffer "*Django*"))
+  (with-current-buffer (get-buffer-create "*Django*")
+    (start-pythonic :process "djangonaut"
+                    :buffer "*Django*"
+                    :args (append (list "-m" "django") command)
+                    :cwd (djangonaut-get-project-root))
+    (erase-buffer)
+    (comint-mode)
+    (pop-to-buffer "*Django*")))
 
 (defun djangonaut-dired-installed-apps ()
   (interactive)
@@ -518,7 +521,7 @@ print(settings_path, end='')
 
 (defvar djangonaut-mode-map
   (let ((map (make-keymap)))
-    (define-key map (kbd "C-c r !") 'djangonaut-management-command)
+    (define-key map (kbd "C-c r !") 'djangonaut-run-management-command)
     (define-key map (kbd "C-c r i") 'djangonaut-dired-installed-apps)
     (define-key map (kbd "C-c r a") 'djangonaut-find-admin-class)
     (define-key map (kbd "C-c r m") 'djangonaut-find-model)
