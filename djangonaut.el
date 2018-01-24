@@ -32,12 +32,15 @@
 
 (defvar djangonaut-get-pythonpath-code "
 from __future__ import print_function
+
 from sys import path
+
 print('\\n'.join(path))
 ")
 
 (defvar djangonaut-get-project-root-code "
 from __future__ import print_function
+
 from importlib import import_module
 from os import environ
 from os.path import dirname
@@ -46,6 +49,7 @@ settings_module = environ['DJANGO_SETTINGS_MODULE']
 package_name = settings_module.split('.', 1)[0]
 package = import_module(package_name)
 project_root = dirname(dirname(package.__file__))
+
 print(project_root, end='')
 ")
 
@@ -57,18 +61,21 @@ from django.conf import settings
 apps.populate(settings.INSTALLED_APPS)
 
 from django.core.management import get_commands
+
 print('\\n'.join(get_commands().keys()))
 ")
 
 (defvar djangonaut-get-app-paths-code "
 from __future__ import print_function
-from json import dumps
 
 from django.apps import apps
 from django.conf import settings
 apps.populate(settings.INSTALLED_APPS)
 
+from json import dumps
+
 paths = {app.label: app.path for app in apps.get_app_configs()}
+
 print(dumps(paths), end='')
 ")
 
@@ -95,14 +102,16 @@ print(dumps(admin_classes), end='')
 
 (defvar djangonaut-get-models-code "
 from __future__ import print_function
-from inspect import findsource, getfile
-from json import dumps
 
 from django.apps import apps
 from django.conf import settings
 apps.populate(settings.INSTALLED_APPS)
 
+from inspect import findsource, getfile
+from json import dumps
+
 models = {model._meta.app_label + '.' + model.__name__: [getfile(model), findsource(model)[1]] for model in apps.get_models()}
+
 print(dumps(models), end='')
 ")
 
@@ -145,9 +154,9 @@ from importlib import import_module
 from inspect import findsource, getfile, isclass
 from json import dumps
 
-import_module(settings.ROOT_URLCONF)
-
 from rest_framework.serializers import Serializer
+
+import_module(settings.ROOT_URLCONF)
 
 serializers = {}
 for obj in get_objects():
@@ -304,12 +313,14 @@ print(dumps(staticfiles), end='')
 
 (defvar djangonaut-get-settings-path-code "
 from __future__ import print_function
+
 from importlib import import_module
 from os import environ
 
 settings_module = environ['DJANGO_SETTINGS_MODULE']
 module = import_module(settings_module)
 settings_path = module.__file__
+
 print(settings_path, end='')
 ")
 
