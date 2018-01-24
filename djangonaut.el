@@ -152,7 +152,7 @@ apps.populate(settings.INSTALLED_APPS)
 
 from gc import get_objects
 from importlib import import_module
-from inspect import findsource, getfile, isclass
+from inspect import findsource, getfile, getmodule, isclass
 from json import dumps
 
 from rest_framework.serializers import Serializer
@@ -162,7 +162,8 @@ import_module(settings.ROOT_URLCONF)
 serializers = {}
 for obj in get_objects():
     if isclass(obj) and issubclass(obj, Serializer):
-        serializers[obj.__name__] = [getfile(obj), findsource(obj)[1]]
+        name = getmodule(obj).__name__ + '.' + obj.__name__
+        serializers[name] = [getfile(obj), findsource(obj)[1]]
 
 print(dumps(serializers), end='')
 ")
