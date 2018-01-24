@@ -123,7 +123,7 @@ from django.conf import settings
 apps.populate(settings.INSTALLED_APPS)
 
 from gc import get_objects
-from inspect import findsource, getfile
+from inspect import findsource, getfile, getmodule
 from json import dumps
 from weakref import ReferenceType
 
@@ -137,7 +137,8 @@ for obj in get_objects():
                 receiver = receiver()
                 if receiver is None:
                     continue
-            receivers[receiver.__name__] = [getfile(receiver), findsource(receiver)[1]]
+            name = getmodule(receiver).__name__ + '.' + receiver.__name__
+            receivers[name] = [getfile(receiver), findsource(receiver)[1]]
 
 print(dumps(receivers), end='')
 ")
