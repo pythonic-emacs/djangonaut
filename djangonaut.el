@@ -65,6 +65,28 @@ from django.core.management import get_commands
 print('\\n'.join(get_commands().keys()))
 ")
 
+(defvar djangonaut-get-command-definitions-code "
+from __future__ import print_function
+
+from django.apps import apps
+from django.conf import settings
+apps.populate(settings.INSTALLED_APPS)
+
+from importlib import import_module
+from inspect import findsource, getfile
+from json import dumps
+
+from django.core.management import get_commands
+
+commands = {}
+for command_name, module_name in get_commands().items():
+    module = import_module(module_name + '.management.commands.' + command_name)
+    command = module.Command
+    commands[command_name] = [getfile(command), findsource(command)[1]]
+
+print(dumps(commands), end='')
+")
+
 (defvar djangonaut-get-app-paths-code "
 from __future__ import print_function
 
@@ -363,6 +385,9 @@ print(settings_path, end='')
 (defun djangonaut-get-commands ()
   (split-string (djangonaut-call djangonaut-get-commands-code) nil t))
 
+(defun djangonaut-get-command-definitions ()
+  (json-read-from-string (djangonaut-call djangonaut-get-command-definitions-code)))
+
 (defun djangonaut-get-app-paths ()
   (json-read-from-string (djangonaut-call djangonaut-get-app-paths-code)))
 
@@ -415,6 +440,19 @@ print(settings_path, end='')
     (when (pythonic-remote-p)
       (setq directory (concat (pythonic-tramp-connection) directory)))
     (dired directory)))
+
+(defun djangonaut-find-management-command ()
+  (interactive)
+  (let* ((commands (djangonaut-get-command-definitions))
+         (command (intern (completing-read "Commmand: " (mapcar 'symbol-name (mapcar 'car commands)) nil t)))
+         (code (cdr (assoc command commands)))
+         (filename (elt code 0))
+         (lineno (elt code 1)))
+    (when (pythonic-remote-p)
+      (setq filename (concat (pythonic-tramp-connection) filename)))
+    (find-file filename)
+    (goto-char (point-min))
+    (forward-line lineno)))
 
 (defun djangonaut-find-admin-class ()
   (interactive)
@@ -536,6 +574,7 @@ print(settings_path, end='')
   (let ((map (make-keymap)))
     (define-key map (kbd "C-c r !") 'djangonaut-run-management-command)
     (define-key map (kbd "C-c r i") 'djangonaut-dired-installed-apps)
+    (define-key map (kbd "C-c r c") 'djangonaut-find-management-command)
     (define-key map (kbd "C-c r a") 'djangonaut-find-admin-class)
     (define-key map (kbd "C-c r m") 'djangonaut-find-model)
     (define-key map (kbd "C-c r r") 'djangonaut-find-signal-receiver)
