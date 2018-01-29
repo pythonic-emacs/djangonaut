@@ -159,6 +159,28 @@ for obj in get_objects():
 print(dumps(managers), end='')
 ")
 
+(defvar djangonaut-get-sql-functions-code "
+from __future__ import print_function
+
+from django.apps import apps
+from django.conf import settings
+apps.populate(settings.INSTALLED_APPS)
+
+from gc import get_objects
+from inspect import findsource, getfile, getmodule, isclass
+from json import dumps
+
+from django.db.models import Func
+
+functions = {}
+for obj in get_objects():
+    if isclass(obj) and issubclass(obj, Func):
+        name = getmodule(obj).__name__ + '.' + obj.__name__
+        functions[name] = [getfile(obj), findsource(obj)[1]]
+
+print(dumps(functions), end='')
+")
+
 (defvar djangonaut-get-signal-receivers-code "
 from __future__ import print_function
 
@@ -422,6 +444,9 @@ print(settings_path, end='')
 (defun djangonaut-get-managers ()
   (json-read-from-string (djangonaut-call djangonaut-get-managers-code)))
 
+(defun djangonaut-get-sql-functions ()
+  (json-read-from-string (djangonaut-call djangonaut-get-sql-functions-code)))
+
 (defun djangonaut-get-signal-receivers ()
   (json-read-from-string (djangonaut-call djangonaut-get-signal-receivers-code)))
 
@@ -510,6 +535,19 @@ print(settings_path, end='')
   (let* ((managers (djangonaut-get-managers))
          (manager (intern (completing-read "Manager: " (mapcar 'symbol-name (mapcar 'car managers)) nil t)))
          (code (cdr (assoc manager managers)))
+         (filename (elt code 0))
+         (lineno (elt code 1)))
+    (when (pythonic-remote-p)
+      (setq filename (concat (pythonic-tramp-connection) filename)))
+    (find-file filename)
+    (goto-char (point-min))
+    (forward-line lineno)))
+
+(defun djangonaut-find-sql-function ()
+  (interactive)
+  (let* ((functions (djangonaut-get-sql-functions))
+         (func (intern (completing-read "Function: " (mapcar 'symbol-name (mapcar 'car functions)) nil t)))
+         (code (cdr (assoc func functions)))
          (filename (elt code 0))
          (lineno (elt code 1)))
     (when (pythonic-remote-p)
@@ -616,6 +654,7 @@ print(settings_path, end='')
     (define-key map (kbd "C-c r a") 'djangonaut-find-admin-class)
     (define-key map (kbd "C-c r m") 'djangonaut-find-model)
     (define-key map (kbd "C-c r M") 'djangonaut-find-manager)
+    (define-key map (kbd "C-c r q") 'djangonaut-find-sql-function)
     (define-key map (kbd "C-c r r") 'djangonaut-find-signal-receiver)
     (define-key map (kbd "C-c r s") 'djangonaut-find-drf-serializer)
     (define-key map (kbd "C-c r v") 'djangonaut-find-view)
