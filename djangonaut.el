@@ -137,7 +137,7 @@ models = {model._meta.app_label + '.' + model.__name__: [getfile(model), findsou
 print(dumps(models), end='')
 ")
 
-(defvar djangonaut-get-managers-code "
+(defvar djangonaut-get-model-managers-code "
 from __future__ import print_function
 
 from django.apps import apps
@@ -441,8 +441,8 @@ print(settings_path, end='')
 (defun djangonaut-get-models ()
   (json-read-from-string (djangonaut-call djangonaut-get-models-code)))
 
-(defun djangonaut-get-managers ()
-  (json-read-from-string (djangonaut-call djangonaut-get-managers-code)))
+(defun djangonaut-get-model-managers ()
+  (json-read-from-string (djangonaut-call djangonaut-get-model-managers-code)))
 
 (defun djangonaut-get-sql-functions ()
   (json-read-from-string (djangonaut-call djangonaut-get-sql-functions-code)))
@@ -530,9 +530,9 @@ print(settings_path, end='')
     (goto-char (point-min))
     (forward-line lineno)))
 
-(defun djangonaut-find-manager ()
+(defun djangonaut-find-model-manager ()
   (interactive)
-  (let* ((managers (djangonaut-get-managers))
+  (let* ((managers (djangonaut-get-model-managers))
          (manager (intern (completing-read "Manager: " (mapcar 'symbol-name (mapcar 'car managers)) nil t)))
          (code (cdr (assoc manager managers)))
          (filename (elt code 0))
@@ -653,7 +653,7 @@ print(settings_path, end='')
     (define-key map (kbd "C-c r c") 'djangonaut-find-management-command)
     (define-key map (kbd "C-c r a") 'djangonaut-find-admin-class)
     (define-key map (kbd "C-c r m") 'djangonaut-find-model)
-    (define-key map (kbd "C-c r M") 'djangonaut-find-manager)
+    (define-key map (kbd "C-c r M") 'djangonaut-find-model-manager)
     (define-key map (kbd "C-c r q") 'djangonaut-find-sql-function)
     (define-key map (kbd "C-c r r") 'djangonaut-find-signal-receiver)
     (define-key map (kbd "C-c r s") 'djangonaut-find-drf-serializer)
