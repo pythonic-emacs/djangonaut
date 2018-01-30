@@ -508,49 +508,97 @@ print(settings_path, end='')
   (interactive)
   (djangonaut-find-file-and-line #'find-file "Command: " (djangonaut-get-command-definitions)))
 
+(defun djangonaut-find-management-command-other-window ()
+  (interactive)
+  (djangonaut-find-file-and-line #'find-file-other-window "Command: " (djangonaut-get-command-definitions)))
+
 (defun djangonaut-find-admin-class ()
   (interactive)
   (djangonaut-find-file-and-line #'find-file "Admin-Class: " (djangonaut-get-admin-classes)))
+
+(defun djangonaut-find-admin-class-other-window ()
+  (interactive)
+  (djangonaut-find-file-and-line #'find-file-other-window "Admin-Class: " (djangonaut-get-admin-classes)))
 
 (defun djangonaut-find-model ()
   (interactive)
   (djangonaut-find-file-and-line #'find-file "Model: " (djangonaut-get-models)))
 
+(defun djangonaut-find-model-other-window ()
+  (interactive)
+  (djangonaut-find-file-and-line #'find-file-other-window "Model: " (djangonaut-get-models)))
+
 (defun djangonaut-find-model-manager ()
   (interactive)
   (djangonaut-find-file-and-line #'find-file "Manager: " (djangonaut-get-model-managers)))
+
+(defun djangonaut-find-model-manager-other-window ()
+  (interactive)
+  (djangonaut-find-file-and-line #'find-file-other-window "Manager: " (djangonaut-get-model-managers)))
 
 (defun djangonaut-find-sql-function ()
   (interactive)
   (djangonaut-find-file-and-line #'find-file "Function: " (djangonaut-get-sql-functions)))
 
+(defun djangonaut-find-sql-function-other-window ()
+  (interactive)
+  (djangonaut-find-file-and-line #'find-file-other-window "Function: " (djangonaut-get-sql-functions)))
+
 (defun djangonaut-find-signal-receiver ()
   (interactive)
   (djangonaut-find-file-and-line #'find-file "Receiver: " (djangonaut-get-signal-receivers)))
+
+(defun djangonaut-find-signal-receiver-other-window ()
+  (interactive)
+  (djangonaut-find-file-and-line #'find-file-other-window "Receiver: " (djangonaut-get-signal-receivers)))
 
 (defun djangonaut-find-drf-serializer ()
   (interactive)
   (djangonaut-find-file-and-line #'find-file "Serializer: " (djangonaut-get-drf-serializers)))
 
+(defun djangonaut-find-drf-serializer-other-window ()
+  (interactive)
+  (djangonaut-find-file-and-line #'find-file-other-window "Serializer: " (djangonaut-get-drf-serializers)))
+
 (defun djangonaut-find-view ()
   (interactive)
   (djangonaut-find-file-and-line #'find-file "View: " (djangonaut-get-views)))
+
+(defun djangonaut-find-view-other-window ()
+  (interactive)
+  (djangonaut-find-file-and-line #'find-file-other-window "View: " (djangonaut-get-views)))
 
 (defun djangonaut-find-template ()
   (interactive)
   (djangonaut-find-file #'find-file "Template: " (djangonaut-get-templates)))
 
+(defun djangonaut-find-template-other-window ()
+  (interactive)
+  (djangonaut-find-file #'find-file-other-window "Template: " (djangonaut-get-templates)))
+
 (defun djangonaut-find-template-tag ()
   (interactive)
   (djangonaut-find-file-and-line #'find-file "Template Tag: " (djangonaut-get-template-tags)))
+
+(defun djangonaut-find-template-tag-other-window ()
+  (interactive)
+  (djangonaut-find-file-and-line #'find-file-other-window "Template Tag: " (djangonaut-get-template-tags)))
 
 (defun djangonaut-find-template-filter ()
   (interactive)
   (djangonaut-find-file-and-line #'find-file "Template Filter: " (djangonaut-get-template-filters)))
 
+(defun djangonaut-find-template-filter-other-window ()
+  (interactive)
+  (djangonaut-find-file-and-line #'find-file-other-window "Template Filter: " (djangonaut-get-template-filters)))
+
 (defun djangonaut-find-static-file ()
   (interactive)
   (djangonaut-find-file #'find-file "Static: " (djangonaut-get-static-files)))
+
+(defun djangonaut-find-static-file-other-window ()
+  (interactive)
+  (djangonaut-find-file #'find-file-other-window "Static: " (djangonaut-get-static-files)))
 
 (defun djangonaut-find-settings-module ()
   (interactive)
@@ -558,6 +606,13 @@ print(settings_path, end='')
     (when (pythonic-remote-p)
       (setq filename (concat (pythonic-tramp-connection) filename)))
     (find-file filename)))
+
+(defun djangonaut-find-settings-module-other-window ()
+  (interactive)
+  (let ((filename (djangonaut-get-settings-path)))
+    (when (pythonic-remote-p)
+      (setq filename (concat (pythonic-tramp-connection) filename)))
+    (find-file-other-window filename)))
 
 (defvar djangonaut-mode-map
   (let ((map (make-keymap)))
@@ -576,6 +631,19 @@ print(settings_path, end='')
     (define-key map (kbd "C-c r f") 'djangonaut-find-template-filter)
     (define-key map (kbd "C-c r j") 'djangonaut-find-static-file)
     (define-key map (kbd "C-c r S") 'djangonaut-find-settings-module)
+    (define-key map (kbd "C-c r 4 c") 'djangonaut-find-management-command-other-window)
+    (define-key map (kbd "C-c r 4 a") 'djangonaut-find-admin-class-other-window)
+    (define-key map (kbd "C-c r 4 m") 'djangonaut-find-model-other-window)
+    (define-key map (kbd "C-c r 4 M") 'djangonaut-find-model-manager-other-window)
+    (define-key map (kbd "C-c r 4 q") 'djangonaut-find-sql-function-other-window)
+    (define-key map (kbd "C-c r 4 r") 'djangonaut-find-signal-receiver-other-window)
+    (define-key map (kbd "C-c r 4 s") 'djangonaut-find-drf-serializer-other-window)
+    (define-key map (kbd "C-c r 4 v") 'djangonaut-find-view-other-window)
+    (define-key map (kbd "C-c r 4 t") 'djangonaut-find-template-other-window)
+    (define-key map (kbd "C-c r 4 g") 'djangonaut-find-template-tag-other-window)
+    (define-key map (kbd "C-c r 4 f") 'djangonaut-find-template-filter-other-window)
+    (define-key map (kbd "C-c r 4 j") 'djangonaut-find-static-file-other-window)
+    (define-key map (kbd "C-c r 4 S") 'djangonaut-find-settings-module-other-window)
     map))
 
 (defvar djangonaut-mode-lighter " Django")
