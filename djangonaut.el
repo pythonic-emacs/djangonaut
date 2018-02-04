@@ -392,6 +392,32 @@ settings_path = module.__file__
 print(settings_path, end='')
 ")
 
+(defvar djangonaut-app-paths-history nil)
+
+(defvar djangonaut-command-definitions-history nil)
+
+(defvar djangonaut-admin-classes-history nil)
+
+(defvar djangonaut-models-history nil)
+
+(defvar djangonaut-model-managers-history nil)
+
+(defvar djangonaut-sql-functions-history nil)
+
+(defvar djangonaut-signal-receivers-history nil)
+
+(defvar djangonaut-drf-serializers-history nil)
+
+(defvar djangonaut-views-history nil)
+
+(defvar djangonaut-templates-history nil)
+
+(defvar djangonaut-template-tags-history nil)
+
+(defvar djangonaut-template-filters-history nil)
+
+(defvar djangonaut-static-files-history nil)
+
 (defun djangonaut-get-pythonpath ()
   (split-string
    (with-output-to-string
@@ -426,15 +452,15 @@ print(settings_path, end='')
         (error "Python exit with status code %d" exit-code)))
     output))
 
-(defun djangonaut-find-file (func prompt collection)
-  (let* ((key (intern (completing-read prompt (mapcar 'symbol-name (mapcar 'car collection)) nil t)))
+(defun djangonaut-find-file (func prompt collection hist)
+  (let* ((key (intern (completing-read prompt (mapcar 'symbol-name (mapcar 'car collection)) nil t nil hist)))
          (value (cdr (assoc key collection))))
     (when (pythonic-remote-p)
       (setq value (concat (pythonic-tramp-connection) value)))
     (apply func value nil)))
 
-(defun djangonaut-find-file-and-line (func prompt collection)
-  (let* ((key (intern (completing-read prompt (mapcar 'symbol-name (mapcar 'car collection)) nil t)))
+(defun djangonaut-find-file-and-line (func prompt collection hist)
+  (let* ((key (intern (completing-read prompt (mapcar 'symbol-name (mapcar 'car collection)) nil t nil hist)))
          (code (cdr (assoc key collection)))
          (value (elt code 0))
          (lineno (elt code 1)))
@@ -502,107 +528,107 @@ print(settings_path, end='')
 
 (defun djangonaut-dired-installed-apps ()
   (interactive)
-  (djangonaut-find-file #'dired "App: " (djangonaut-get-app-paths)))
+  (djangonaut-find-file #'dired "App: " (djangonaut-get-app-paths) 'djangonaut-app-paths-history))
 
 (defun djangonaut-dired-installed-apps-other-window ()
   (interactive)
-  (djangonaut-find-file #'dired-other-window "App: " (djangonaut-get-app-paths)))
+  (djangonaut-find-file #'dired-other-window "App: " (djangonaut-get-app-paths) 'djangonaut-app-paths-history))
 
 (defun djangonaut-find-management-command ()
   (interactive)
-  (djangonaut-find-file-and-line #'find-file "Command: " (djangonaut-get-command-definitions)))
+  (djangonaut-find-file-and-line #'find-file "Command: " (djangonaut-get-command-definitions) 'djangonaut-command-definitions-history))
 
 (defun djangonaut-find-management-command-other-window ()
   (interactive)
-  (djangonaut-find-file-and-line #'find-file-other-window "Command: " (djangonaut-get-command-definitions)))
+  (djangonaut-find-file-and-line #'find-file-other-window "Command: " (djangonaut-get-command-definitions) 'djangonaut-command-definitions-history))
 
 (defun djangonaut-find-admin-class ()
   (interactive)
-  (djangonaut-find-file-and-line #'find-file "Admin Class: " (djangonaut-get-admin-classes)))
+  (djangonaut-find-file-and-line #'find-file "Admin Class: " (djangonaut-get-admin-classes) 'djangonaut-admin-classes-history))
 
 (defun djangonaut-find-admin-class-other-window ()
   (interactive)
-  (djangonaut-find-file-and-line #'find-file-other-window "Admin Class: " (djangonaut-get-admin-classes)))
+  (djangonaut-find-file-and-line #'find-file-other-window "Admin Class: " (djangonaut-get-admin-classes) 'djangonaut-admin-classes-history))
 
 (defun djangonaut-find-model ()
   (interactive)
-  (djangonaut-find-file-and-line #'find-file "Model: " (djangonaut-get-models)))
+  (djangonaut-find-file-and-line #'find-file "Model: " (djangonaut-get-models) 'djangonaut-models-history))
 
 (defun djangonaut-find-model-other-window ()
   (interactive)
-  (djangonaut-find-file-and-line #'find-file-other-window "Model: " (djangonaut-get-models)))
+  (djangonaut-find-file-and-line #'find-file-other-window "Model: " (djangonaut-get-models) 'djangonaut-models-history))
 
 (defun djangonaut-find-model-manager ()
   (interactive)
-  (djangonaut-find-file-and-line #'find-file "Model Manager: " (djangonaut-get-model-managers)))
+  (djangonaut-find-file-and-line #'find-file "Model Manager: " (djangonaut-get-model-managers) 'djangonaut-model-managers-history))
 
 (defun djangonaut-find-model-manager-other-window ()
   (interactive)
-  (djangonaut-find-file-and-line #'find-file-other-window "Model Manager: " (djangonaut-get-model-managers)))
+  (djangonaut-find-file-and-line #'find-file-other-window "Model Manager: " (djangonaut-get-model-managers) 'djangonaut-model-managers-history))
 
 (defun djangonaut-find-sql-function ()
   (interactive)
-  (djangonaut-find-file-and-line #'find-file "SQL Function: " (djangonaut-get-sql-functions)))
+  (djangonaut-find-file-and-line #'find-file "SQL Function: " (djangonaut-get-sql-functions) 'djangonaut-sql-functions-history))
 
 (defun djangonaut-find-sql-function-other-window ()
   (interactive)
-  (djangonaut-find-file-and-line #'find-file-other-window "SQL Function: " (djangonaut-get-sql-functions)))
+  (djangonaut-find-file-and-line #'find-file-other-window "SQL Function: " (djangonaut-get-sql-functions) 'djangonaut-sql-functions-history))
 
 (defun djangonaut-find-signal-receiver ()
   (interactive)
-  (djangonaut-find-file-and-line #'find-file "Signal Receiver: " (djangonaut-get-signal-receivers)))
+  (djangonaut-find-file-and-line #'find-file "Signal Receiver: " (djangonaut-get-signal-receivers) 'djangonaut-signal-receivers-history))
 
 (defun djangonaut-find-signal-receiver-other-window ()
   (interactive)
-  (djangonaut-find-file-and-line #'find-file-other-window "Signal Receiver: " (djangonaut-get-signal-receivers)))
+  (djangonaut-find-file-and-line #'find-file-other-window "Signal Receiver: " (djangonaut-get-signal-receivers) 'djangonaut-signal-receivers-history))
 
 (defun djangonaut-find-drf-serializer ()
   (interactive)
-  (djangonaut-find-file-and-line #'find-file "Serializer: " (djangonaut-get-drf-serializers)))
+  (djangonaut-find-file-and-line #'find-file "Serializer: " (djangonaut-get-drf-serializers) 'djangonaut-drf-serializers-history))
 
 (defun djangonaut-find-drf-serializer-other-window ()
   (interactive)
-  (djangonaut-find-file-and-line #'find-file-other-window "Serializer: " (djangonaut-get-drf-serializers)))
+  (djangonaut-find-file-and-line #'find-file-other-window "Serializer: " (djangonaut-get-drf-serializers) 'djangonaut-drf-serializers-history))
 
 (defun djangonaut-find-view ()
   (interactive)
-  (djangonaut-find-file-and-line #'find-file "View: " (djangonaut-get-views)))
+  (djangonaut-find-file-and-line #'find-file "View: " (djangonaut-get-views) 'djangonaut-views-history))
 
 (defun djangonaut-find-view-other-window ()
   (interactive)
-  (djangonaut-find-file-and-line #'find-file-other-window "View: " (djangonaut-get-views)))
+  (djangonaut-find-file-and-line #'find-file-other-window "View: " (djangonaut-get-views) 'djangonaut-views-history))
 
 (defun djangonaut-find-template ()
   (interactive)
-  (djangonaut-find-file #'find-file "Template: " (djangonaut-get-templates)))
+  (djangonaut-find-file #'find-file "Template: " (djangonaut-get-templates) 'djangonaut-templates-history))
 
 (defun djangonaut-find-template-other-window ()
   (interactive)
-  (djangonaut-find-file #'find-file-other-window "Template: " (djangonaut-get-templates)))
+  (djangonaut-find-file #'find-file-other-window "Template: " (djangonaut-get-templates) 'djangonaut-templates-history))
 
 (defun djangonaut-find-template-tag ()
   (interactive)
-  (djangonaut-find-file-and-line #'find-file "Template Tag: " (djangonaut-get-template-tags)))
+  (djangonaut-find-file-and-line #'find-file "Template Tag: " (djangonaut-get-template-tags) 'djangonaut-template-tags-history))
 
 (defun djangonaut-find-template-tag-other-window ()
   (interactive)
-  (djangonaut-find-file-and-line #'find-file-other-window "Template Tag: " (djangonaut-get-template-tags)))
+  (djangonaut-find-file-and-line #'find-file-other-window "Template Tag: " (djangonaut-get-template-tags) 'djangonaut-template-tags-history))
 
 (defun djangonaut-find-template-filter ()
   (interactive)
-  (djangonaut-find-file-and-line #'find-file "Template Filter: " (djangonaut-get-template-filters)))
+  (djangonaut-find-file-and-line #'find-file "Template Filter: " (djangonaut-get-template-filters) 'djangonaut-template-filters-history))
 
 (defun djangonaut-find-template-filter-other-window ()
   (interactive)
-  (djangonaut-find-file-and-line #'find-file-other-window "Template Filter: " (djangonaut-get-template-filters)))
+  (djangonaut-find-file-and-line #'find-file-other-window "Template Filter: " (djangonaut-get-template-filters) 'djangonaut-template-filters-history))
 
 (defun djangonaut-find-static-file ()
   (interactive)
-  (djangonaut-find-file #'find-file "Static File: " (djangonaut-get-static-files)))
+  (djangonaut-find-file #'find-file "Static File: " (djangonaut-get-static-files) 'djangonaut-static-files-history))
 
 (defun djangonaut-find-static-file-other-window ()
   (interactive)
-  (djangonaut-find-file #'find-file-other-window "Static File: " (djangonaut-get-static-files)))
+  (djangonaut-find-file #'find-file-other-window "Static File: " (djangonaut-get-static-files) 'djangonaut-static-files-history))
 
 (defun djangonaut-find-settings-module ()
   (interactive)
