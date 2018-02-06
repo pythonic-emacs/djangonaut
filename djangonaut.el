@@ -394,7 +394,7 @@ print(settings_path, end='')
 
 (defvar djangonaut-app-paths-history nil)
 
-(defvar djangonaut-command-definitions-history nil)
+(defvar djangonaut-commands-history nil)
 
 (defvar djangonaut-admin-classes-history nil)
 
@@ -516,7 +516,7 @@ print(settings_path, end='')
   (djangonaut-call djangonaut-get-settings-path-code))
 
 (defun djangonaut-run-management-command (&rest command)
-  (interactive (split-string (completing-read "Command: " (djangonaut-get-commands) nil nil) " " t))
+  (interactive (split-string (completing-read "Command: " (djangonaut-get-commands) nil nil nil 'djangonaut-commands-history) " " t))
   (with-current-buffer (get-buffer-create "*Django*")
     (start-pythonic :process "djangonaut"
                     :buffer "*Django*"
@@ -536,11 +536,11 @@ print(settings_path, end='')
 
 (defun djangonaut-find-management-command ()
   (interactive)
-  (djangonaut-find-file-and-line #'find-file "Command: " (djangonaut-get-command-definitions) 'djangonaut-command-definitions-history))
+  (djangonaut-find-file-and-line #'find-file "Command: " (djangonaut-get-command-definitions) 'djangonaut-commands-history))
 
 (defun djangonaut-find-management-command-other-window ()
   (interactive)
-  (djangonaut-find-file-and-line #'find-file-other-window "Command: " (djangonaut-get-command-definitions) 'djangonaut-command-definitions-history))
+  (djangonaut-find-file-and-line #'find-file-other-window "Command: " (djangonaut-get-command-definitions) 'djangonaut-commands-history))
 
 (defun djangonaut-find-admin-class ()
   (interactive)
