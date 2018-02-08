@@ -517,14 +517,18 @@ print(settings_path, end='')
 
 (defun djangonaut-run-management-command (&rest command)
   (interactive (split-string (completing-read "Command: " (djangonaut-get-commands) nil nil nil 'djangonaut-commands-history) " " t))
-  (with-current-buffer (get-buffer-create "*Django*")
-    (start-pythonic :process "djangonaut"
-                    :buffer "*Django*"
-                    :args (append (list "-m" "django") command)
-                    :cwd (djangonaut-get-project-root))
-    (erase-buffer)
-    (comint-mode)
-    (pop-to-buffer "*Django*")))
+  (let* ((buffer (get-buffer-create "*Django*"))
+         (process (get-buffer-process buffer)))
+    (when (and process (process-live-p process))
+      (setq buffer (generate-new-buffer "*Django*")))
+    (with-current-buffer buffer
+      (start-pythonic :process "djangonaut"
+                      :buffer buffer
+                      :args (append (list "-m" "django") command)
+                      :cwd (djangonaut-get-project-root))
+      (erase-buffer)
+      (comint-mode)
+      (pop-to-buffer buffer))))
 
 (defun djangonaut-dired-installed-apps ()
   (interactive)
