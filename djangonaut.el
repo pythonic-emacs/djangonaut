@@ -234,6 +234,31 @@ for obj in get_objects():
 print(dumps(serializers), end='')
 ")
 
+(defvar djangonaut-get-drf-permissions-code "
+from __future__ import print_function
+
+from django.apps import apps
+from django.conf import settings
+apps.populate(settings.INSTALLED_APPS)
+
+from gc import get_objects
+from importlib import import_module
+from inspect import findsource, getfile, getmodule, isclass
+from json import dumps
+
+from rest_framework.permissions import BasePermission
+
+import_module(settings.ROOT_URLCONF)
+
+permissions = {}
+for obj in get_objects():
+    if isclass(obj) and issubclass(obj, BasePermission):
+        name = getmodule(obj).__name__ + '.' + obj.__name__
+        permissions[name] = [getfile(obj), findsource(obj)[1]]
+
+print(dumps(permissions), end='')
+")
+
 (defvar djangonaut-get-views-code "
 from __future__ import print_function
 
@@ -408,6 +433,8 @@ print(settings_path, end='')
 
 (defvar djangonaut-drf-serializers-history nil)
 
+(defvar djangonaut-drf-permissions-history nil)
+
 (defvar djangonaut-views-history nil)
 
 (defvar djangonaut-templates-history nil)
@@ -496,6 +523,9 @@ print(settings_path, end='')
 
 (defun djangonaut-get-drf-serializers ()
   (json-read-from-string (djangonaut-call djangonaut-get-drf-serializers-code)))
+
+(defun djangonaut-get-drf-permissions ()
+  (json-read-from-string (djangonaut-call djangonaut-get-drf-permissions-code)))
 
 (defun djangonaut-get-views ()
   (json-read-from-string (djangonaut-call djangonaut-get-views-code)))
@@ -594,6 +624,14 @@ print(settings_path, end='')
   (interactive)
   (djangonaut-find-file-and-line #'find-file-other-window "Serializer: " (djangonaut-get-drf-serializers) 'djangonaut-drf-serializers-history))
 
+(defun djangonaut-find-drf-permission ()
+  (interactive)
+  (djangonaut-find-file-and-line #'find-file "Permission: " (djangonaut-get-drf-permissions) 'djangonaut-drf-permissions-history))
+
+(defun djangonaut-find-drf-permission-other-window ()
+  (interactive)
+  (djangonaut-find-file-and-line #'find-file-other-window "Permission: " (djangonaut-get-drf-permissions) 'djangonaut-drf-permissions-history))
+
 (defun djangonaut-find-view ()
   (interactive)
   (djangonaut-find-file-and-line #'find-file "View: " (djangonaut-get-views) 'djangonaut-views-history))
@@ -659,6 +697,7 @@ print(settings_path, end='')
     (define-key map (kbd "C-c r q") 'djangonaut-find-sql-function)
     (define-key map (kbd "C-c r r") 'djangonaut-find-signal-receiver)
     (define-key map (kbd "C-c r s") 'djangonaut-find-drf-serializer)
+    (define-key map (kbd "C-c r p") 'djangonaut-find-drf-permission)
     (define-key map (kbd "C-c r v") 'djangonaut-find-view)
     (define-key map (kbd "C-c r t") 'djangonaut-find-template)
     (define-key map (kbd "C-c r g") 'djangonaut-find-template-tag)
@@ -673,6 +712,7 @@ print(settings_path, end='')
     (define-key map (kbd "C-c r 4 q") 'djangonaut-find-sql-function-other-window)
     (define-key map (kbd "C-c r 4 r") 'djangonaut-find-signal-receiver-other-window)
     (define-key map (kbd "C-c r 4 s") 'djangonaut-find-drf-serializer-other-window)
+    (define-key map (kbd "C-c r 4 p") 'djangonaut-find-drf-permission-other-window)
     (define-key map (kbd "C-c r 4 v") 'djangonaut-find-view-other-window)
     (define-key map (kbd "C-c r 4 t") 'djangonaut-find-template-other-window)
     (define-key map (kbd "C-c r 4 g") 'djangonaut-find-template-tag-other-window)
