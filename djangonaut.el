@@ -119,7 +119,7 @@ class Parser(object):
     def add_argument(*args, **kwargs):
 
         if len(args) > 2 or len(args) < 1 or not all(map(lambda x: x.startswith('-'), args)):
-            raise Exception('Unsupported arguments')
+            raise Exception('Unsupported arguments: {0} {1}'.format(args, kwargs))
         elif len(args) > 1:
             if args[0].startswith('--'):
                 name = args[0]
@@ -567,8 +567,7 @@ print(settings_path, end='')
   (json-read-from-string (djangonaut-call djangonaut-get-command-definitions-code)))
 
 (defun djangonaut-get-command-arguments (command)
-  (let ((json-array-type 'list))
-    (json-read-from-string (djangonaut-call djangonaut-get-command-arguments-code command))))
+  (json-read-from-string (djangonaut-call djangonaut-get-command-arguments-code command)))
 
 (defun djangonaut-get-app-paths ()
   (json-read-from-string (djangonaut-call djangonaut-get-app-paths-code)))
@@ -628,11 +627,14 @@ print(settings_path, end='')
       (pop-to-buffer buffer))))
 
 (defun djangonaut-run-popup-management-command (command)
+  (interactive (list (completing-read "Command: " (djangonaut-get-commands) nil t nil 'djangonaut-commands-history)))
   (let* ((arguments (djangonaut-get-command-arguments command))
          (func-name (intern (concat "djangonaut-run-" (s-replace "_" "-" command) "-popup")))
          (popup `(magit-define-popup ,func-name ""
-                   :switches ',(cdr (assoc 'switches arguments))
-                   :options ',(cdr (assoc 'options arguments))))
+                   :switches ',(mapcar (lambda (x) (list (elt (elt x 0) 0) (elt x 1) (elt x 2)))
+                                       (cdr (assoc 'switches arguments)))
+                   :options ',(mapcar (lambda (x) (list (elt (elt x 0) 0) (elt x 1) (elt x 2)))
+                                      (cdr (assoc 'options arguments)))))
          (func (eval popup)))
     (funcall func)))
 
