@@ -94,20 +94,51 @@ from django.apps import apps
 from django.conf import settings
 apps.populate(settings.INSTALLED_APPS)
 
-from sys import argv
 from importlib import import_module
 from json import dumps
+from random import choice
+from string import ascii_letters
+from sys import argv
 
 from django.core.management import get_commands
 
 arguments = {}
+known_shortcuts = set([])
+
+def get_free_shortcut(short):
+    result = short
+    while result in known_shortcuts:
+        result = choice(ascii_letters)
+    known_shortcuts.add(result)
+    return result
 
 class Parser(object):
 
     @staticmethod
     def add_argument(*args, **kwargs):
 
-        arguments[args[0]] = kwargs
+        if len(args) > 2 or len(args) < 1 or not all(map(lambda x: x.startswith('-'), args)):
+            raise Exception('Unsupported arguments')
+        elif len(args) > 1:
+            if args[0].startswith('--'):
+                name = args[0]
+                shortcut = get_free_shortcut(args[1][1])
+            else:
+                name = args[1]
+                shortcut = get_free_shortcut(args[0][1])
+        else:
+            if args[0].startswith('--'):
+                name = args[0]
+                shortcut = get_free_shortcut(args[0][2])
+            else:
+                name = args[0]
+                shortcut = get_free_shortcut(args[0][1])
+
+        if kwargs.get('action') == 'store_true':
+            target = arguments.setdefault('switches', [])
+        else:
+            target = arguments.setdefault('options', [])
+        target.append([shortcut, kwargs['help'], name])
 
 command_name = argv[-1]
 module_name = get_commands()[command_name]
@@ -535,7 +566,8 @@ print(settings_path, end='')
   (json-read-from-string (djangonaut-call djangonaut-get-command-definitions-code)))
 
 (defun djangonaut-get-command-arguments (command)
-  (json-read-from-string (djangonaut-call djangonaut-get-command-arguments-code command)))
+  (let ((json-array-type 'list))
+    (json-read-from-string (djangonaut-call djangonaut-get-command-arguments-code command))))
 
 (defun djangonaut-get-app-paths ()
   (json-read-from-string (djangonaut-call djangonaut-get-app-paths-code)))
