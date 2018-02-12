@@ -118,27 +118,30 @@ class Parser(object):
     @staticmethod
     def add_argument(*args, **kwargs):
 
+        if kwargs.get('action') == 'store_true':
+            target = arguments.setdefault('switches', [])
+            get_option = lambda x, end=None: x
+        else:
+            target = arguments.setdefault('options', [])
+            get_option = lambda x, end='=': x + end
+
         if len(args) > 2 or len(args) < 1 or not all(map(lambda x: x.startswith('-'), args)):
             raise Exception('Unsupported arguments: {0} {1}'.format(args, kwargs))
         elif len(args) > 1:
             if args[0].startswith('--'):
-                name = args[0]
+                name = get_option(args[0])
                 shortcut = get_free_shortcut(args[1][1])
             else:
-                name = args[1]
+                name = get_option(args[1])
                 shortcut = get_free_shortcut(args[0][1])
         else:
             if args[0].startswith('--'):
-                name = args[0]
+                name = get_option(args[0])
                 shortcut = get_free_shortcut(args[0][2])
             else:
-                name = args[0]
+                name = get_option(args[0], ' ')
                 shortcut = get_free_shortcut(args[0][1])
 
-        if kwargs.get('action') == 'store_true':
-            target = arguments.setdefault('switches', [])
-        else:
-            target = arguments.setdefault('options', [])
         target.append([shortcut, kwargs['help'], name])
 
 command_name = argv[-1]
@@ -611,6 +614,13 @@ print(settings_path, end='')
 (defun djangonaut-get-settings-path ()
   (djangonaut-call djangonaut-get-settings-path-code))
 
+(defun djangonaut-run-management-command-dwim ()
+  (interactive)
+  (call-interactively
+   (if current-prefix-arg
+       'djangonaut-run-popup-management-command
+     'djangonaut-run-management-command)))
+
 (defun djangonaut-run-management-command (&rest command)
   (interactive (split-string (completing-read "Command: " (djangonaut-get-commands) nil nil nil 'djangonaut-commands-history) " " t))
   (let* ((buffer (get-buffer-create "*Django*"))
@@ -630,11 +640,15 @@ print(settings_path, end='')
   (interactive (list (completing-read "Command: " (djangonaut-get-commands) nil t nil 'djangonaut-commands-history)))
   (let* ((arguments (djangonaut-get-command-arguments command))
          (func-name (intern (concat "djangonaut-run-" (s-replace "_" "-" command) "-popup")))
+         (args-name (intern (concat "djangonaut-run-" (s-replace "_" "-" command) "-arguments")))
          (popup `(magit-define-popup ,func-name ""
                    :switches ',(mapcar (lambda (x) (list (elt (elt x 0) 0) (elt x 1) (elt x 2)))
                                        (cdr (assoc 'switches arguments)))
                    :options ',(mapcar (lambda (x) (list (elt (elt x 0) 0) (elt x 1) (elt x 2)))
-                                      (cdr (assoc 'options arguments)))))
+                                      (cdr (assoc 'options arguments)))
+                   :actions '((?\  "Run" (lambda ()
+                                           (interactive)
+                                           (apply 'djangonaut-run-management-command ,command (,args-name)))))))
          (func (eval popup)))
     (funcall func)))
 
@@ -766,7 +780,7 @@ print(settings_path, end='')
 
 (defvar djangonaut-mode-map
   (let ((map (make-keymap)))
-    (define-key map (kbd "C-c r !") 'djangonaut-run-management-command)
+    (define-key map (kbd "C-c r !") 'djangonaut-run-management-command-dwim)
     (define-key map (kbd "C-c r i") 'djangonaut-dired-installed-apps)
     (define-key map (kbd "C-c r c") 'djangonaut-find-management-command)
     (define-key map (kbd "C-c r a") 'djangonaut-find-admin-class)
