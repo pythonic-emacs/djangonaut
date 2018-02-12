@@ -5,7 +5,7 @@
 ;; Author: Artem Malyshev <proofit404@gmail.com>
 ;; URL: https://github.com/proofit404/djangonaut
 ;; Version: 0.0.1
-;; Package-Requires: ((emacs "24") (pythonic "0.1.0") (f "0.20.0"))
+;; Package-Requires: ((emacs "24") (pythonic "0.1.0") (f "0.20.0") (magit-popup "2.6.0"))
 
 ;; This program is free software; you can redistribute it and/or modify
 ;; it under the terms of the GNU General Public License as published by
@@ -26,6 +26,7 @@
 
 ;;; Code:
 
+(require 'magit-popup)
 (require 'pythonic)
 (require 'json)
 (require 'f)
@@ -625,6 +626,15 @@ print(settings_path, end='')
       (erase-buffer)
       (comint-mode)
       (pop-to-buffer buffer))))
+
+(defun djangonaut-run-popup-management-command (command)
+  (let* ((arguments (djangonaut-get-command-arguments command))
+         (func-name (intern (concat "djangonaut-run-" (s-replace "_" "-" command) "-popup")))
+         (popup `(magit-define-popup ,func-name ""
+                   :switches ',(cdr (assoc 'switches arguments))
+                   :options ',(cdr (assoc 'options arguments))))
+         (func (eval popup)))
+    (funcall func)))
 
 (defun djangonaut-dired-installed-apps ()
   (interactive)
