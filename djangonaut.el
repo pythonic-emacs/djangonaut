@@ -87,6 +87,37 @@ for command_name, module_name in get_commands().items():
 print(dumps(commands), end='')
 ")
 
+(defvar djangonaut-get-command-arguments-code "
+from __future__ import print_function
+
+from django.apps import apps
+from django.conf import settings
+apps.populate(settings.INSTALLED_APPS)
+
+from sys import argv
+from importlib import import_module
+from json import dumps
+
+from django.core.management import get_commands
+
+arguments = {}
+
+class Parser(object):
+
+    @staticmethod
+    def add_argument(*args, **kwargs):
+
+        arguments[args[0]] = kwargs
+
+command_name = argv[-1]
+module_name = get_commands()[command_name]
+module = import_module(module_name + '.management.commands.' + command_name)
+command = module.Command()
+command.add_arguments(Parser)
+
+print(dumps(arguments), end='')
+")
+
 (defvar djangonaut-get-app-paths-code "
 from __future__ import print_function
 
@@ -461,14 +492,14 @@ print(settings_path, end='')
       (call-pythonic :buffer standard-output
                      :args (list "-c" djangonaut-get-project-root-code)))))
 
-(defun djangonaut-call (code)
+(defun djangonaut-call (code &rest args)
   (let (exit-code output)
     (setq output
           (with-output-to-string
             (with-current-buffer
                 standard-output
               (setq exit-code
-                    (call-pythonic :buffer standard-output :args (list "-c" code))))))
+                    (call-pythonic :buffer standard-output :args (append (list "-c" code) args))))))
     (when (not (zerop exit-code))
       (with-current-buffer (get-buffer-create "*Django*")
         (erase-buffer)
@@ -502,6 +533,9 @@ print(settings_path, end='')
 
 (defun djangonaut-get-command-definitions ()
   (json-read-from-string (djangonaut-call djangonaut-get-command-definitions-code)))
+
+(defun djangonaut-get-command-arguments (command)
+  (json-read-from-string (djangonaut-call djangonaut-get-command-arguments-code command)))
 
 (defun djangonaut-get-app-paths ()
   (json-read-from-string (djangonaut-call djangonaut-get-app-paths-code)))
