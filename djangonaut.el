@@ -118,30 +118,40 @@ class Parser(object):
     @staticmethod
     def add_argument(*args, **kwargs):
 
+        assert 0 < len(args) < 3, 'Unsupported arguments: {0} {1}'.format(args, kwargs)
+
         if kwargs.get('action') == 'store_true':
             target = arguments.setdefault('switches', [])
-            get_option = lambda x, end=None: x
+            get_option = lambda x, end: x
         else:
             target = arguments.setdefault('options', [])
-            get_option = lambda x, end='=': x + end
+            get_option = lambda x, end: x + end
 
-        if len(args) > 2 or len(args) < 1 or not all(map(lambda x: x.startswith('-'), args)):
-            raise Exception('Unsupported arguments: {0} {1}'.format(args, kwargs))
-        elif len(args) > 1:
-            if args[0].startswith('--'):
-                name = get_option(args[0])
-                shortcut = get_free_shortcut(args[1][1])
+        data = {'optional': None, 'short': None, 'positional': None}
+
+        for arg in args:
+            if arg.startswith('--'):
+                data['optional'] = arg
+            elif arg.startswith('-'):
+                data['short'] = arg
             else:
-                name = get_option(args[1])
-                shortcut = get_free_shortcut(args[0][1])
+                data['positional'] = arg
+
+        if data['positional']:
+            key = '='
+            option = ''
+            suffix = ''
+        elif data['short']:
+            key = data['short'][1]
+            option = data['optional'] or data['short']
+            suffix = '=' if data['optional'] else ' '
         else:
-            if args[0].startswith('--'):
-                name = get_option(args[0])
-                shortcut = get_free_shortcut(args[0][2])
-            else:
-                name = get_option(args[0], ' ')
-                shortcut = get_free_shortcut(args[0][1])
+            key = data['optional'][2]
+            option = data['optional']
+            suffix = '='
 
+        name = get_option(option, suffix)
+        shortcut = get_free_shortcut(key)
         target.append([shortcut, kwargs['help'], name])
 
 command_name = argv[-1]
