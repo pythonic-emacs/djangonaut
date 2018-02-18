@@ -27,7 +27,9 @@
 ;;; Code:
 
 (require 'magit-popup)
+(require 'ansi-color)
 (require 'pythonic)
+(require 'comint)
 (require 'json)
 (require 'f)
 
@@ -641,9 +643,13 @@ print(settings_path, end='')
       (start-pythonic :process "djangonaut"
                       :buffer buffer
                       :args (append (list "-m" "django") command)
-                      :cwd (djangonaut-get-project-root))
-      (erase-buffer)
+                      :cwd (djangonaut-get-project-root)
+                      :filter (lambda (process string)
+                                (comint-output-filter process (ansi-color-apply string))))
+      (let ((inhibit-read-only t))
+        (erase-buffer))
       (comint-mode)
+      (setq-local comint-prompt-read-only t)
       (pop-to-buffer buffer))))
 
 (defun djangonaut-run-popup-management-command (command)
