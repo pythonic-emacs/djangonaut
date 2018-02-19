@@ -389,10 +389,13 @@ from json import dumps
 from os import walk
 from os.path import join
 
+from django.contrib.staticfiles.utils import matches_patterns
 from django.template import engines
 from django.template.backends.django import DjangoTemplates
 from django.template.loaders.filesystem import Loader as FileSystemLoader
 from django.template.loaders.app_directories import Loader as AppDirectoriesLoader
+
+ignore_patterns = list(set(apps.get_app_config('staticfiles').ignore_patterns))
 
 templates = {}
 
@@ -404,7 +407,8 @@ for engine in engines.all():
                     for root, _, files in walk(template_directory):
                         for template in files:
                             template_path = join(root, template)
-                            templates.setdefault(template_path[len(template_directory) + 1:], template_path)
+                            if not matches_patterns(template_path, ignore_patterns):
+                                templates.setdefault(template_path[len(template_directory) + 1:], template_path)
 
 print(dumps(templates), end='')
 ")
