@@ -402,6 +402,34 @@ collect_views(get_resolver(get_urlconf()))
 print(dumps(views), end='')
 ")
 
+(defvar djangonaut-get-url-modules-code "
+from __future__ import print_function
+
+from django.apps import apps
+from django.conf import settings
+apps.populate(settings.INSTALLED_APPS)
+
+from json import dumps
+from types import ModuleType
+
+from django.urls import get_resolver, get_urlconf, RegexURLResolver
+
+url_modules = {}
+
+def collect_url_modules(conf):
+    name = conf.urlconf_name
+    if isinstance(name, ModuleType):
+        name = name.__name__
+    url_modules[name] = conf.urlconf_module.__file__
+    for pattern in conf.url_patterns:
+        if isinstance(pattern, RegexURLResolver) and not isinstance(pattern.urlconf_module, list):
+            collect_url_modules(pattern)
+
+collect_url_modules(get_resolver(get_urlconf()))
+
+print(dumps(url_modules), end='')
+")
+
 (defvar djangonaut-get-templates-code "
 from __future__ import print_function
 
@@ -545,6 +573,8 @@ print(settings_path, end='')
 
 (defvar djangonaut-views-history nil)
 
+(defvar djangonaut-url-modules-history nil)
+
 (defvar djangonaut-templates-history nil)
 
 (defvar djangonaut-template-tags-history nil)
@@ -648,6 +678,9 @@ print(settings_path, end='')
 
 (defun djangonaut-get-views ()
   (json-read-from-string (djangonaut-call djangonaut-get-views-code)))
+
+(defun djangonaut-get-url-modules ()
+  (json-read-from-string (djangonaut-call djangonaut-get-url-modules-code)))
 
 (defun djangonaut-get-templates ()
   (json-read-from-string (djangonaut-call djangonaut-get-templates-code)))
@@ -794,6 +827,14 @@ print(settings_path, end='')
   (interactive)
   (djangonaut-find-file-and-line #'find-file-other-window "View: " (djangonaut-get-views) 'djangonaut-views-history))
 
+(defun djangonaut-find-url-module ()
+  (interactive)
+  (djangonaut-find-file #'find-file "URL Module: " (djangonaut-get-url-modules) 'djangonaut-url-modules-history))
+
+(defun djangonaut-find-url-module-other-window ()
+  (interactive)
+  (djangonaut-find-file #'find-file-other-window "URL Module: " (djangonaut-get-url-modules) 'djangonaut-url-modules-history))
+
 (defun djangonaut-find-template ()
   (interactive)
   (djangonaut-find-file #'find-file "Template: " (djangonaut-get-templates) 'djangonaut-templates-history))
@@ -854,6 +895,7 @@ print(settings_path, end='')
     (define-key map (kbd "C-c r s") 'djangonaut-find-drf-serializer)
     (define-key map (kbd "C-c r p") 'djangonaut-find-drf-permission)
     (define-key map (kbd "C-c r v") 'djangonaut-find-view)
+    (define-key map (kbd "C-c r u") 'djangonaut-find-url-module)
     (define-key map (kbd "C-c r t") 'djangonaut-find-template)
     (define-key map (kbd "C-c r g") 'djangonaut-find-template-tag)
     (define-key map (kbd "C-c r f") 'djangonaut-find-template-filter)
@@ -870,6 +912,7 @@ print(settings_path, end='')
     (define-key map (kbd "C-c r 4 s") 'djangonaut-find-drf-serializer-other-window)
     (define-key map (kbd "C-c r 4 p") 'djangonaut-find-drf-permission-other-window)
     (define-key map (kbd "C-c r 4 v") 'djangonaut-find-view-other-window)
+    (define-key map (kbd "C-c r 4 u") 'djangonaut-find-url-module-other-window)
     (define-key map (kbd "C-c r 4 t") 'djangonaut-find-template-other-window)
     (define-key map (kbd "C-c r 4 g") 'djangonaut-find-template-tag-other-window)
     (define-key map (kbd "C-c r 4 f") 'djangonaut-find-template-filter-other-window)
