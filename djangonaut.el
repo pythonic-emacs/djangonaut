@@ -237,6 +237,30 @@ for obj in get_objects():
 print(dumps(managers), end='')
 ")
 
+(defvar djangonaut-get-migrations-code "
+from __future__ import print_function
+
+from django.apps import apps
+from django.conf import settings
+apps.populate(settings.INSTALLED_APPS)
+
+from inspect import findsource, getfile
+from json import dumps
+
+from django.db.migrations.loader import MigrationLoader
+
+loader = MigrationLoader(connection=None, load=False)
+loader.load_disk()
+
+migrations = {}
+for (label, module_name), migration in loader.disk_migrations.items():
+    name = label + '.' + module_name
+    Migration = migration.__class__
+    migrations[name] = [getfile(Migration), findsource(Migration)[1]]
+
+print(dumps(migrations), end='')
+")
+
 (defvar djangonaut-get-sql-functions-code "
 from __future__ import print_function
 
@@ -509,6 +533,8 @@ print(settings_path, end='')
 
 (defvar djangonaut-model-managers-history nil)
 
+(defvar djangonaut-migrations-history nil)
+
 (defvar djangonaut-sql-functions-history nil)
 
 (defvar djangonaut-signal-receivers-history nil)
@@ -604,6 +630,9 @@ print(settings_path, end='')
 
 (defun djangonaut-get-model-managers ()
   (json-read-from-string (djangonaut-call djangonaut-get-model-managers-code)))
+
+(defun djangonaut-get-migrations ()
+  (json-read-from-string (djangonaut-call djangonaut-get-migrations-code)))
 
 (defun djangonaut-get-sql-functions ()
   (json-read-from-string (djangonaut-call djangonaut-get-sql-functions-code)))
@@ -717,6 +746,14 @@ print(settings_path, end='')
   (interactive)
   (djangonaut-find-file-and-line #'find-file-other-window "Model Manager: " (djangonaut-get-model-managers) 'djangonaut-model-managers-history))
 
+(defun djangonaut-find-migration ()
+  (interactive)
+  (djangonaut-find-file-and-line #'find-file "Migration: " (djangonaut-get-migrations) 'djangonaut-migrations-history))
+
+(defun djangonaut-find-migration-other-window ()
+  (interactive)
+  (djangonaut-find-file-and-line #'find-file-other-window "Migration: " (djangonaut-get-migrations) 'djangonaut-migrations-history))
+
 (defun djangonaut-find-sql-function ()
   (interactive)
   (djangonaut-find-file-and-line #'find-file "SQL Function: " (djangonaut-get-sql-functions) 'djangonaut-sql-functions-history))
@@ -811,6 +848,7 @@ print(settings_path, end='')
     (define-key map (kbd "C-c r a") 'djangonaut-find-admin-class)
     (define-key map (kbd "C-c r m") 'djangonaut-find-model)
     (define-key map (kbd "C-c r M") 'djangonaut-find-model-manager)
+    (define-key map (kbd "C-c r n") 'djangonaut-find-migration)
     (define-key map (kbd "C-c r q") 'djangonaut-find-sql-function)
     (define-key map (kbd "C-c r r") 'djangonaut-find-signal-receiver)
     (define-key map (kbd "C-c r s") 'djangonaut-find-drf-serializer)
@@ -826,6 +864,7 @@ print(settings_path, end='')
     (define-key map (kbd "C-c r 4 a") 'djangonaut-find-admin-class-other-window)
     (define-key map (kbd "C-c r 4 m") 'djangonaut-find-model-other-window)
     (define-key map (kbd "C-c r 4 M") 'djangonaut-find-model-manager-other-window)
+    (define-key map (kbd "C-c r 4 n") 'djangonaut-find-migration-other-window)
     (define-key map (kbd "C-c r 4 q") 'djangonaut-find-sql-function-other-window)
     (define-key map (kbd "C-c r 4 r") 'djangonaut-find-signal-receiver-other-window)
     (define-key map (kbd "C-c r 4 s") 'djangonaut-find-drf-serializer-other-window)
