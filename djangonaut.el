@@ -253,7 +253,7 @@ loader = MigrationLoader(connection=None, load=False)
 loader.load_disk()
 
 migrations = {}
-for (label, module_name), migration in loader.disk_migrations.items():
+for (label, module_name), migration in sorted(loader.disk_migrations.items()):
     name = label + '.' + module_name
     Migration = migration.__class__
     migrations[name] = [getfile(Migration), findsource(Migration)[1]]
