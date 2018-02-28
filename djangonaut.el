@@ -155,7 +155,8 @@ class Parser(object):
 
         name = get_option(option, suffix)
         shortcut = get_free_shortcut(key)
-        target.append([shortcut, kwargs['help'], name])
+        description = kwargs.get('help') or data['positional'] or data['optional'] or data['short']
+        target.append([shortcut, description, name])
 
 command_name = argv[-1]
 module_name = get_commands()[command_name]
