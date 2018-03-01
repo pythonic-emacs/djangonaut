@@ -39,6 +39,7 @@ install:
   - cask install
   - pip install -U pip wheel setuptools
   - pip install $DJANGO_VERSION
+  - pip install djangorestframework
 before_script:
   - mkdir $HOME/testproject
   - DJANGO_SETTINGS_MODULE= django-admin startproject testproject $HOME/testproject
