@@ -8,66 +8,171 @@
 (require 'djangonaut)
 
 (ert-deftest test-djangonaut-get-pythonpath ()
-  (should-not (null (djangonaut-get-pythonpath))))
+  (condition-case err
+      (should-not (null (djangonaut-get-pythonpath)))
+    (error
+     (with-current-buffer "*Django*"
+       (message (buffer-substring-no-properties (point-min) (point-max))))
+     (signal (car err) (cdr err)))))
 
 (ert-deftest test-djangonaut-get-project-root ()
-  (should-not (null (djangonaut-get-project-root))))
+  (condition-case err
+      (should-not (null (djangonaut-get-project-root)))
+    (error
+     (with-current-buffer "*Django*"
+       (message (buffer-substring-no-properties (point-min) (point-max))))
+     (signal (car err) (cdr err)))))
 
 (ert-deftest test-djangonaut-get-commands ()
-  (should-not (null (djangonaut-get-commands))))
+  (condition-case err
+      (should-not (null (djangonaut-get-commands)))
+    (error
+     (with-current-buffer "*Django*"
+       (message (buffer-substring-no-properties (point-min) (point-max))))
+     (signal (car err) (cdr err)))))
 
 (ert-deftest test-djangonaut-get-command-definitions ()
-  (should-not (null (djangonaut-get-command-definitions))))
+  (condition-case err
+      (should-not (null (djangonaut-get-command-definitions)))
+    (error
+     (with-current-buffer "*Django*"
+       (message (buffer-substring-no-properties (point-min) (point-max))))
+     (signal (car err) (cdr err)))))
 
 (ert-deftest test-djangonaut-get-command-arguments ()
-  (should-not (null (djangonaut-get-command-arguments "startapp"))))
+  (condition-case err
+      (should-not (null (djangonaut-get-command-arguments "startapp")))
+    (error
+     (with-current-buffer "*Django*"
+       (message (buffer-substring-no-properties (point-min) (point-max))))
+     (signal (car err) (cdr err)))))
 
 (ert-deftest test-djangonaut-get-app-paths ()
-  (should-not (null (djangonaut-get-app-paths))))
+  (condition-case err
+      (should-not (null (djangonaut-get-app-paths)))
+    (error
+     (with-current-buffer "*Django*"
+       (message (buffer-substring-no-properties (point-min) (point-max))))
+     (signal (car err) (cdr err)))))
 
 (ert-deftest test-djangonaut-get-admin-classes ()
-  (should-not (null (djangonaut-get-admin-classes))))
+  (condition-case err
+      (should-not (null (djangonaut-get-admin-classes)))
+    (error
+     (with-current-buffer "*Django*"
+       (message (buffer-substring-no-properties (point-min) (point-max))))
+     (signal (car err) (cdr err)))))
 
 (ert-deftest test-djangonaut-get-models ()
-  (should-not (null (djangonaut-get-models))))
+  (condition-case err
+      (should-not (null (djangonaut-get-models)))
+    (error
+     (with-current-buffer "*Django*"
+       (message (buffer-substring-no-properties (point-min) (point-max))))
+     (signal (car err) (cdr err)))))
 
 (ert-deftest test-djangonaut-get-model-managers ()
-  (should-not (null (djangonaut-get-model-managers))))
+  (condition-case err
+      (should-not (null (djangonaut-get-model-managers)))
+    (error
+     (with-current-buffer "*Django*"
+       (message (buffer-substring-no-properties (point-min) (point-max))))
+     (signal (car err) (cdr err)))))
 
 (ert-deftest test-djangonaut-get-migrations ()
-  (should-not (null (djangonaut-get-migrations))))
+  (condition-case err
+      (should-not (null (djangonaut-get-migrations)))
+    (error
+     (with-current-buffer "*Django*"
+       (message (buffer-substring-no-properties (point-min) (point-max))))
+     (signal (car err) (cdr err)))))
 
 (ert-deftest test-djangonaut-get-sql-functions ()
-  (should-not (null (djangonaut-get-sql-functions))))
+  (condition-case err
+      (should-not (null (djangonaut-get-sql-functions)))
+    (error
+     (with-current-buffer "*Django*"
+       (message (buffer-substring-no-properties (point-min) (point-max))))
+     (signal (car err) (cdr err)))))
 
 (ert-deftest test-djangonaut-get-signal-receivers ()
-  (should-not (null (djangonaut-get-signal-receivers))))
+  (condition-case err
+      (should-not (null (djangonaut-get-signal-receivers)))
+    (error
+     (with-current-buffer "*Django*"
+       (message (buffer-substring-no-properties (point-min) (point-max))))
+     (signal (car err) (cdr err)))))
 
 (ert-deftest test-djangonaut-get-drf-serializers ()
-  (should-not (null (djangonaut-get-drf-serializers))))
+  (condition-case err
+      (should-not (null (djangonaut-get-drf-serializers)))
+    (error
+     (with-current-buffer "*Django*"
+       (message (buffer-substring-no-properties (point-min) (point-max))))
+     (signal (car err) (cdr err)))))
 
 (ert-deftest test-djangonaut-get-drf-permissions ()
-  (should-not (null (djangonaut-get-drf-permissions))))
+  (condition-case err
+      (should-not (null (djangonaut-get-drf-permissions)))
+    (error
+     (with-current-buffer "*Django*"
+       (message (buffer-substring-no-properties (point-min) (point-max))))
+     (signal (car err) (cdr err)))))
 
 (ert-deftest test-djangonaut-get-views ()
-  (should-not (null (djangonaut-get-views))))
+  (condition-case err
+      (should-not (null (djangonaut-get-views)))
+    (error
+     (with-current-buffer "*Django*"
+       (message (buffer-substring-no-properties (point-min) (point-max))))
+     (signal (car err) (cdr err)))))
 
 (ert-deftest test-djangonaut-get-url-modules ()
-  (should-not (null (djangonaut-get-url-modules))))
+  (condition-case err
+      (should-not (null (djangonaut-get-url-modules)))
+    (error
+     (with-current-buffer "*Django*"
+       (message (buffer-substring-no-properties (point-min) (point-max))))
+     (signal (car err) (cdr err)))))
 
 (ert-deftest test-djangonaut-get-templates ()
-  (should-not (null (djangonaut-get-templates))))
+  (condition-case err
+      (should-not (null (djangonaut-get-templates)))
+    (error
+     (with-current-buffer "*Django*"
+       (message (buffer-substring-no-properties (point-min) (point-max))))
+     (signal (car err) (cdr err)))))
 
 (ert-deftest test-djangonaut-get-template-tags ()
-  (should-not (null (djangonaut-get-template-tags))))
+  (condition-case err
+      (should-not (null (djangonaut-get-template-tags)))
+    (error
+     (with-current-buffer "*Django*"
+       (message (buffer-substring-no-properties (point-min) (point-max))))
+     (signal (car err) (cdr err)))))
 
 (ert-deftest test-djangonaut-get-template-filters ()
-  (should-not (null (djangonaut-get-template-filters))))
+  (condition-case err
+      (should-not (null (djangonaut-get-template-filters)))
+    (error
+     (with-current-buffer "*Django*"
+       (message (buffer-substring-no-properties (point-min) (point-max))))
+     (signal (car err) (cdr err)))))
 
 (ert-deftest test-djangonaut-get-static-files ()
-  (should-not (null (djangonaut-get-static-files))))
+  (condition-case err
+      (should-not (null (djangonaut-get-static-files)))
+    (error
+     (with-current-buffer "*Django*"
+       (message (buffer-substring-no-properties (point-min) (point-max))))
+     (signal (car err) (cdr err)))))
 
 (ert-deftest test-djangonaut-get-settings-path ()
-  (should-not (null (djangonaut-get-settings-path))))
+  (condition-case err
+      (should-not (null (djangonaut-get-settings-path)))
+    (error
+     (with-current-buffer "*Django*"
+       (message (buffer-substring-no-properties (point-min) (point-max))))
+     (signal (car err) (cdr err)))))
 
 ;;; djangonaut-test.el ends here
