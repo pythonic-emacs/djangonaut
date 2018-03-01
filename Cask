@@ -5,4 +5,5 @@
 (development
  (depends-on "cask")
  (depends-on "docker-tramp")
- (depends-on "gif-screencast"))
+ (depends-on "gif-screencast")
+ (depends-on "ert-runner"))
