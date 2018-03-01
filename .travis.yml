@@ -1,0 +1,46 @@
+sudo: false
+language: python
+python:
+  - 2.7
+  - 3.4
+  - 3.5
+  - 3.6
+env:
+  global:
+    - DJANGO_SETTINGS_MODULE=testproject.settings
+    - PYTHONPATH=$HOME/testproject
+    - EVM_EMACS=emacs-25.3-travis
+    - PATH=$HOME/.evm/bin:$HOME/.cask/bin:$PATH
+  matrix:
+    - DJANGO_VERSION="Django>=1.8,<1.9"
+    - DJANGO_VERSION="Django>=1.9,<1.10"
+    - DJANGO_VERSION="Django>=1.10,<1.11"
+    - DJANGO_VERSION="Django>=1.11,<2.0"
+    - DJANGO_VERSION="Django>=2.0,<2.1"
+matrix:
+  exclude:
+    - python: 2.7
+      env: DJANGO_VERSION="Django>=2.0,<2.1"
+    - python: 3.6
+      env: DJANGO_VERSION="Django>=1.8,<1.9"
+    - python: 3.6
+      env: DJANGO_VERSION="Django>=1.9,<1.10"
+    - python: 3.6
+      env: DJANGO_VERSION="Django>=1.10,<1.11"
+cache:
+  directories:
+  - $HOME/.cache/pip/wheels
+before_install:
+  - git clone https://github.com/rejeep/evm $HOME/.evm
+  - git clone https://github.com/cask/cask $HOME/.cask
+  - evm config path /tmp
+install:
+  - evm install $EVM_EMACS --use
+  - cask install
+  - pip install -U pip wheel setuptools
+  - pip install $DJANGO_VERSION
+before_script:
+  - mkdir $HOME/testproject
+  - DJANGO_SETTINGS_MODULE= django-admin startproject testproject $HOME/testproject
+script:
+  - cask exec ert-runner
