@@ -20,7 +20,7 @@
   (should-not (null (djangonaut-get-command-definitions))))
 
 (ert-deftest test-djangonaut-get-command-arguments ()
-  (should-not (null (djangonaut-get-command-arguments))))
+  (should-not (null (djangonaut-get-command-arguments "startapp"))))
 
 (ert-deftest test-djangonaut-get-app-paths ()
   (should-not (null (djangonaut-get-app-paths))))
