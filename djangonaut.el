@@ -191,7 +191,11 @@ apps.populate(settings.INSTALLED_APPS)
 from inspect import findsource, getfile
 from json import dumps
 
-from django.contrib.admin.sites import all_sites
+try:
+    from django.contrib.admin.sites import all_sites
+except ImportError:
+    from django.contrib.admin.sites import site
+    all_sites = [site]
 
 admin_classes = {}
 for site in all_sites:
