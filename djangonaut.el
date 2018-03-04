@@ -385,7 +385,16 @@ apps.populate(settings.INSTALLED_APPS)
 from inspect import findsource, getfile, getmodule, ismethod
 from json import dumps
 
-from django.urls import get_resolver, get_urlconf, RegexURLPattern, RegexURLResolver
+from django.urls import get_resolver, get_urlconf
+
+try:
+    from django.urls.resolvers import LocalePrefixPattern, RegexPattern, RoutePattern, URLPattern, URLResolver
+    pattern_classes = (LocalePrefixPattern, RegexPattern, RoutePattern, URLPattern)
+    resolver_classes = (URLResolver,)
+except ImportError:
+    from django.urls import RegexURLPattern, RegexURLResolver
+    pattern_classes = (RegexURLPattern,)
+    resolver_classes = (RegexURLResolver,)
 
 try:
     from inspect import unwrap
@@ -399,9 +408,9 @@ views = {}
 
 def collect_views(resolver):
     for pattern in resolver.url_patterns:
-        if isinstance(pattern, RegexURLResolver):
+        if isinstance(pattern, resolver_classes):
             collect_views(pattern)
-        elif isinstance(pattern, RegexURLPattern):
+        elif isinstance(pattern, pattern_classes):
             view = pattern.callback
             if hasattr(view, 'view_class'):
                 # Django as_view result.
@@ -434,7 +443,14 @@ apps.populate(settings.INSTALLED_APPS)
 from json import dumps
 from types import ModuleType
 
-from django.urls import get_resolver, get_urlconf, RegexURLResolver
+from django.urls import get_resolver, get_urlconf
+
+try:
+    from django.urls import URLResolver
+    resolver_classes = (URLResolver,)
+except ImportError:
+    from django.urls import RegexURLResolver
+    resolver_classes = (RegexURLResolver,)
 
 url_modules = {}
 
@@ -444,7 +460,7 @@ def collect_url_modules(conf):
         name = name.__name__
     url_modules[name] = conf.urlconf_module.__file__
     for pattern in conf.url_patterns:
-        if isinstance(pattern, RegexURLResolver) and not isinstance(pattern.urlconf_module, list):
+        if isinstance(pattern, resolver_classes) and not isinstance(pattern.urlconf_module, list):
             collect_url_modules(pattern)
 
 collect_url_modules(get_resolver(get_urlconf()))
