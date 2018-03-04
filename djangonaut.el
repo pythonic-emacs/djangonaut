@@ -64,9 +64,13 @@ from django.apps import apps
 from django.conf import settings
 apps.populate(settings.INSTALLED_APPS)
 
+from json import dumps
+
 from django.core.management import get_commands
 
-print('\\n'.join(get_commands().keys()))
+commands = list(get_commands().keys())
+
+print(dumps(commands), end='')
 ")
 
 (defvar djangonaut-get-command-definitions-code "
@@ -618,20 +622,29 @@ print(settings_path, end='')
               (setq exit-code
                     (call-pythonic :buffer standard-output :args (append (list "-c" code) args))))))
     (when (not (zerop exit-code))
-      (let* ((buffer (get-buffer-create "*Django*"))
-             (process (get-buffer-process buffer)))
-        (when (and process (process-live-p process))
-          (setq buffer (generate-new-buffer "*Django*")))
-        (with-current-buffer buffer
-          (let ((inhibit-read-only t))
-            (erase-buffer))
-          (fundamental-mode)
-          (insert output)
-          (goto-char (point-min))
-          (compilation-minor-mode 1)
-          (pop-to-buffer buffer)
-          (error "Python exit with status code %d" exit-code))))
+      (djangonaut-show-error output (format "Python exit with status code %d" exit-code)))
     output))
+
+(defun djangonaut-read (str)
+  (condition-case err
+      (json-read-from-string str)
+    ((json-readtable-error wrong-type-argument)
+     (djangonaut-show-error str (error-message-string err)))))
+
+(defun djangonaut-show-error (output error-message)
+  (let* ((buffer (get-buffer-create "*Django*"))
+         (process (get-buffer-process buffer)))
+    (when (and process (process-live-p process))
+      (setq buffer (generate-new-buffer "*Django*")))
+    (with-current-buffer buffer
+      (let ((inhibit-read-only t))
+        (erase-buffer))
+      (fundamental-mode)
+      (insert output)
+      (goto-char (point-min))
+      (compilation-minor-mode 1)
+      (pop-to-buffer buffer)
+      (error error-message))))
 
 (defun djangonaut-find-file (func prompt collection hist)
   (let* ((key (intern (completing-read prompt (mapcar 'symbol-name (mapcar 'car collection)) nil t nil hist)))
@@ -652,58 +665,59 @@ print(settings_path, end='')
     (forward-line lineno)))
 
 (defun djangonaut-get-commands ()
-  (split-string (djangonaut-call djangonaut-get-commands-code) nil t))
+  (let ((json-array-type 'list))
+    (djangonaut-read (djangonaut-call djangonaut-get-commands-code))))
 
 (defun djangonaut-get-command-definitions ()
-  (json-read-from-string (djangonaut-call djangonaut-get-command-definitions-code)))
+  (djangonaut-read (djangonaut-call djangonaut-get-command-definitions-code)))
 
 (defun djangonaut-get-command-arguments (command)
-  (json-read-from-string (djangonaut-call djangonaut-get-command-arguments-code command)))
+  (djangonaut-read (djangonaut-call djangonaut-get-command-arguments-code command)))
 
 (defun djangonaut-get-app-paths ()
-  (json-read-from-string (djangonaut-call djangonaut-get-app-paths-code)))
+  (djangonaut-read (djangonaut-call djangonaut-get-app-paths-code)))
 
 (defun djangonaut-get-admin-classes ()
-  (json-read-from-string (djangonaut-call djangonaut-get-admin-classes-code)))
+  (djangonaut-read (djangonaut-call djangonaut-get-admin-classes-code)))
 
 (defun djangonaut-get-models ()
-  (json-read-from-string (djangonaut-call djangonaut-get-models-code)))
+  (djangonaut-read (djangonaut-call djangonaut-get-models-code)))
 
 (defun djangonaut-get-model-managers ()
-  (json-read-from-string (djangonaut-call djangonaut-get-model-managers-code)))
+  (djangonaut-read (djangonaut-call djangonaut-get-model-managers-code)))
 
 (defun djangonaut-get-migrations ()
-  (json-read-from-string (djangonaut-call djangonaut-get-migrations-code)))
+  (djangonaut-read (djangonaut-call djangonaut-get-migrations-code)))
 
 (defun djangonaut-get-sql-functions ()
-  (json-read-from-string (djangonaut-call djangonaut-get-sql-functions-code)))
+  (djangonaut-read (djangonaut-call djangonaut-get-sql-functions-code)))
 
 (defun djangonaut-get-signal-receivers ()
-  (json-read-from-string (djangonaut-call djangonaut-get-signal-receivers-code)))
+  (djangonaut-read (djangonaut-call djangonaut-get-signal-receivers-code)))
 
 (defun djangonaut-get-drf-serializers ()
-  (json-read-from-string (djangonaut-call djangonaut-get-drf-serializers-code)))
+  (djangonaut-read (djangonaut-call djangonaut-get-drf-serializers-code)))
 
 (defun djangonaut-get-drf-permissions ()
-  (json-read-from-string (djangonaut-call djangonaut-get-drf-permissions-code)))
+  (djangonaut-read (djangonaut-call djangonaut-get-drf-permissions-code)))
 
 (defun djangonaut-get-views ()
-  (json-read-from-string (djangonaut-call djangonaut-get-views-code)))
+  (djangonaut-read (djangonaut-call djangonaut-get-views-code)))
 
 (defun djangonaut-get-url-modules ()
-  (json-read-from-string (djangonaut-call djangonaut-get-url-modules-code)))
+  (djangonaut-read (djangonaut-call djangonaut-get-url-modules-code)))
 
 (defun djangonaut-get-templates ()
-  (json-read-from-string (djangonaut-call djangonaut-get-templates-code)))
+  (djangonaut-read (djangonaut-call djangonaut-get-templates-code)))
 
 (defun djangonaut-get-template-tags ()
-  (json-read-from-string (djangonaut-call djangonaut-get-template-tags-code)))
+  (djangonaut-read (djangonaut-call djangonaut-get-template-tags-code)))
 
 (defun djangonaut-get-template-filters ()
-  (json-read-from-string (djangonaut-call djangonaut-get-template-filters-code)))
+  (djangonaut-read (djangonaut-call djangonaut-get-template-filters-code)))
 
 (defun djangonaut-get-static-files ()
-  (json-read-from-string (djangonaut-call djangonaut-get-static-files-code)))
+  (djangonaut-read (djangonaut-call djangonaut-get-static-files-code)))
 
 (defun djangonaut-get-settings-path ()
   (djangonaut-call djangonaut-get-settings-path-code))
