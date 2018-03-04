@@ -194,8 +194,12 @@ from json import dumps
 try:
     from django.contrib.admin.sites import all_sites
 except ImportError:
-    from django.contrib.admin import site
-    all_sites = [site]
+    from gc import get_objects
+    from django.contrib.admin.sites import AdminSite
+    all_sites = []
+    for obj in get_objects():
+        if isinstance(obj, AdminSite):
+            all_sites.append(obj)
 
 admin_classes = {}
 for site in all_sites:
