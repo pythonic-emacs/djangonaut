@@ -382,10 +382,18 @@ from django.apps import apps
 from django.conf import settings
 apps.populate(settings.INSTALLED_APPS)
 
-from inspect import findsource, getfile, getmodule, ismethod, unwrap
+from inspect import findsource, getfile, getmodule, ismethod
 from json import dumps
 
 from django.urls import get_resolver, get_urlconf, RegexURLPattern, RegexURLResolver
+
+try:
+    from inspect import unwrap
+except ImportError:
+    def unwrap(func):
+        while hasattr(func, '__wrapped__'):
+            func = func.__wrapped__
+        return func
 
 views = {}
 
@@ -487,10 +495,18 @@ from django.conf import settings
 apps.populate(settings.INSTALLED_APPS)
 
 from importlib import import_module
-from inspect import findsource, getfile, unwrap
+from inspect import findsource, getfile
 from json import dumps
 
 from django.template.backends.django import get_installed_libraries
+
+try:
+    from inspect import unwrap
+except ImportError:
+    def unwrap(func):
+        while hasattr(func, '__wrapped__'):
+            func = func.__wrapped__
+        return func
 
 libraries = get_installed_libraries()
 libraries['builtin'] = 'django.template.defaulttags'
@@ -513,10 +529,18 @@ from django.conf import settings
 apps.populate(settings.INSTALLED_APPS)
 
 from importlib import import_module
-from inspect import findsource, getfile, unwrap
+from inspect import findsource, getfile
 from json import dumps
 
 from django.template.backends.django import get_installed_libraries
+
+try:
+    from inspect import unwrap
+except ImportError:
+    def unwrap(func):
+        while hasattr(func, '__wrapped__'):
+            func = func.__wrapped__
+        return func
 
 libraries = get_installed_libraries()
 libraries['builtin'] = 'django.template.defaultfilters'
