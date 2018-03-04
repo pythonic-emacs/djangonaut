@@ -201,7 +201,7 @@ admin_classes = {}
 for site in all_sites:
     for admin_instance in site._registry.values():
         admin_class = admin_instance.__class__
-        admin_classes[admin_class.__name__] = [getfile(admin_class), findsource(admin_class)[1]]
+        admin_classes[str(admin_instance)] = [getfile(admin_class), findsource(admin_class)[1]]
 
 print(dumps(admin_classes), end='')
 ")
