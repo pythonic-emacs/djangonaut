@@ -194,7 +194,7 @@ from json import dumps
 try:
     from django.contrib.admin.sites import all_sites
 except ImportError:
-    from django.contrib.admin.sites import site
+    from django.contrib.admin import site
     all_sites = [site]
 
 admin_classes = {}
