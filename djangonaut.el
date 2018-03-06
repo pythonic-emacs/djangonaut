@@ -485,7 +485,7 @@ from django.template.backends.django import DjangoTemplates
 from django.template.loaders.filesystem import Loader as FileSystemLoader
 from django.template.loaders.app_directories import Loader as AppDirectoriesLoader
 
-ignore_patterns = list(set(apps.get_app_config('staticfiles').ignore_patterns))
+ignore_patterns = ['CVS', '.*', '*~']
 
 templates = {}
 
@@ -582,7 +582,7 @@ from json import dumps
 
 from django.contrib.staticfiles.finders import get_finders
 
-ignore_patterns = list(set(apps.get_app_config('staticfiles').ignore_patterns))
+ignore_patterns = ['CVS', '.*', '*~']
 
 staticfiles = {}
 for finder in get_finders():
