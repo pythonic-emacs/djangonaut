@@ -127,7 +127,7 @@ class Parser(object):
 
         assert 0 < len(args) < 3, 'Unsupported arguments: {0} {1}'.format(args, kwargs)
 
-        if kwargs.get('action') == 'store_true':
+        if kwargs.get('action') in ('store_true', 'store_false'):
             target = arguments.setdefault('switches', [])
             get_option = lambda x, end: x
         else:
