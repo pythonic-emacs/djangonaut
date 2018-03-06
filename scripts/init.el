@@ -17,9 +17,9 @@
 
 (global-djangonaut-mode)
 
-(setenv "DJANGO_SETTINGS_MODULE" "settings")
+(setq python-shell-process-environment '("DJANGO_SETTINGS_MODULE=settings"))
 
-(setenv "PYTHONPATH" "/code")
+(setq python-shell-extra-pythonpaths '("/code"))
 
 (setq python-shell-interpreter "/docker:root@olympia_web_1:/usr/local/bin/python")
 
