@@ -667,8 +667,11 @@ print(settings_path, end='')
 
 (defun djangonaut-read (str)
   (condition-case err
-      (json-read-from-string str)
-    ((json-readtable-error wrong-type-argument)
+      (let ((result (json-read-from-string str)))
+        (unless (listp result)
+          (signal 'json-error nil))
+        result)
+    ((json-error wrong-type-argument)
      (djangonaut-show-error str (error-message-string err)))))
 
 (defun djangonaut-show-error (output error-message)
