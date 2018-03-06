@@ -12,21 +12,21 @@ env:
     - EVM_EMACS=emacs-25.3-travis
     - PATH=$HOME/.evm/bin:$HOME/.cask/bin:$PATH
   matrix:
-    - DJANGO_VERSION="Django>=1.8,<1.9"
-    - DJANGO_VERSION="Django>=1.9,<1.10"
-    - DJANGO_VERSION="Django>=1.10,<1.11"
-    - DJANGO_VERSION="Django>=1.11,<2.0"
-    - DJANGO_VERSION="Django>=2.0,<2.1"
+    - DJANGO_VERSION="Django>=1.8,<1.9" DRF_VERSION="djangorestframework>=3.6,<3.7"
+    - DJANGO_VERSION="Django>=1.9,<1.10" DRF_VERSION="djangorestframework>=3.6,<3.7"
+    - DJANGO_VERSION="Django>=1.10,<1.11" DRF_VERSION="djangorestframework"
+    - DJANGO_VERSION="Django>=1.11,<2.0" DRF_VERSION="djangorestframework"
+    - DJANGO_VERSION="Django>=2.0,<2.1" DRF_VERSION="djangorestframework"
 matrix:
   exclude:
     - python: 2.7
-      env: DJANGO_VERSION="Django>=2.0,<2.1"
+      env: DJANGO_VERSION="Django>=2.0,<2.1" DRF_VERSION="djangorestframework"
     - python: 3.6
-      env: DJANGO_VERSION="Django>=1.8,<1.9"
+      env: DJANGO_VERSION="Django>=1.8,<1.9" DRF_VERSION="djangorestframework>=3.6,<3.7"
     - python: 3.6
-      env: DJANGO_VERSION="Django>=1.9,<1.10"
+      env: DJANGO_VERSION="Django>=1.9,<1.10" DRF_VERSION="djangorestframework>=3.6,<3.7"
     - python: 3.6
-      env: DJANGO_VERSION="Django>=1.10,<1.11"
+      env: DJANGO_VERSION="Django>=1.10,<1.11" DRF_VERSION="djangorestframework"
 cache:
   directories:
   - $HOME/.cache/pip/wheels
@@ -39,7 +39,7 @@ install:
   - cask install
   - pip install -U pip wheel setuptools
   - pip install $DJANGO_VERSION
-  - pip install djangorestframework
+  - pip install $DRF_VERSION
 before_script:
   - mkdir $HOME/testproject
   - DJANGO_SETTINGS_MODULE= django-admin startproject testproject $HOME/testproject
