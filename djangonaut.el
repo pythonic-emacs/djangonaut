@@ -385,16 +385,24 @@ apps.populate(settings.INSTALLED_APPS)
 from inspect import findsource, getfile, getmodule, ismethod
 from json import dumps
 
-from django.urls import get_resolver, get_urlconf
+try:
+    from django.urls import get_resolver, get_urlconf
+except ImportError:
+    from django.core.urlresolvers import get_resolver, get_urlconf
 
 try:
     from django.urls.resolvers import LocalePrefixPattern, RegexPattern, RoutePattern, URLPattern, URLResolver
     pattern_classes = (LocalePrefixPattern, RegexPattern, RoutePattern, URLPattern)
     resolver_classes = (URLResolver,)
 except ImportError:
-    from django.urls import RegexURLPattern, RegexURLResolver
-    pattern_classes = (RegexURLPattern,)
-    resolver_classes = (RegexURLResolver,)
+    try:
+        from django.urls import RegexURLPattern, RegexURLResolver
+        pattern_classes = (RegexURLPattern,)
+        resolver_classes = (RegexURLResolver,)
+    except ImportError:
+        from django.core.urlresolvers import RegexURLPattern, RegexURLResolver
+        pattern_classes = (RegexURLPattern,)
+        resolver_classes = (RegexURLResolver,)
 
 try:
     from inspect import unwrap
@@ -443,14 +451,21 @@ apps.populate(settings.INSTALLED_APPS)
 from json import dumps
 from types import ModuleType
 
-from django.urls import get_resolver, get_urlconf
+try:
+    from django.urls import get_resolver, get_urlconf
+except ImportError:
+    from django.core.urlresolvers import get_resolver, get_urlconf
 
 try:
     from django.urls import URLResolver
     resolver_classes = (URLResolver,)
 except ImportError:
-    from django.urls import RegexURLResolver
-    resolver_classes = (RegexURLResolver,)
+    try:
+        from django.urls import RegexURLResolver
+        resolver_classes = (RegexURLResolver,)
+    except ImportError:
+        from django.core.urlresolvers import RegexURLResolver
+        resolver_classes = (RegexURLResolver,)
 
 url_modules = {}
 
