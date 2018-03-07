@@ -6,4 +6,5 @@
  (depends-on "cask")
  (depends-on "docker-tramp")
  (depends-on "gif-screencast")
- (depends-on "ert-runner"))
+ (depends-on "ert-runner")
+ (depends-on "django-theme"))
