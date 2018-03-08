@@ -529,8 +529,6 @@ from importlib import import_module
 from inspect import findsource, getfile
 from json import dumps
 
-from django.template.backends.django import get_installed_libraries
-
 try:
     from inspect import unwrap
 except ImportError:
@@ -539,15 +537,38 @@ except ImportError:
             func = func.__wrapped__
         return func
 
-libraries = get_installed_libraries()
-libraries['builtin'] = 'django.template.defaulttags'
+libraries = {}
+libraries['builtin'] = import_module('django.template.defaulttags').register
+
+try:
+    from django.template.backends.django import get_installed_libraries
+
+    for library_name, library_path in get_installed_libraries().items():
+        libraries[library_name] = import_module(library_path).register
+except ImportError:
+    from pkgutil import walk_packages
+    from django.template.base import get_templatetags_modules
+
+    for package_name in get_templatetags_modules():
+        package = import_module(package_name)
+        if hasattr(package, '__path__'):
+            for entry in walk_packages(package.__path__, package.__name__ + '.'):
+                module = import_module(entry[1])
+                if hasattr(module, 'register'):
+                    libraries[entry[1][len(package_name) + 1:]] = module.register
 
 template_tags = {}
-for library_name, library_path in libraries.items():
-    library = import_module(library_path).register
+for library_name, library in libraries.items():
     for tag_name, tag in library.tags.items():
         tag = unwrap(tag)
-        template_tags[library_name + '.' + tag_name] = [getfile(tag), findsource(tag)[1]]
+        try:
+            template_tags[library_name + '.' + tag_name] = [getfile(tag), findsource(tag)[1]]
+        except TypeError:
+            # This is Django 1.8 and we met functools.partial result.  We take class defined
+            # in the decorator from bound keyword arguments.  This class has a method with a
+            # closure where we can find decorated function.
+            tag = tag.keywords['node_class'].render.__closure__[-1].cell_contents
+            template_tags[library_name + '.' + tag_name] = [getfile(tag), findsource(tag)[1]]
 
 print(dumps(template_tags), end='')
 ")
