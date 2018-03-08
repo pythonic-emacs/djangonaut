@@ -499,6 +499,7 @@ from django.template import engines
 from django.template.backends.django import DjangoTemplates
 from django.template.loaders.filesystem import Loader as FileSystemLoader
 from django.template.loaders.app_directories import Loader as AppDirectoriesLoader
+from django.template.utils import get_app_template_dirs
 
 ignore_patterns = ['CVS', '.*', '*~']
 
@@ -508,7 +509,14 @@ for engine in engines.all():
     if isinstance(engine, DjangoTemplates):
         for loader in engine.engine.template_loaders:
             if isinstance(loader, (FileSystemLoader, AppDirectoriesLoader)):
-                for template_directory in loader.get_dirs():
+                try:
+                    dirs = loader.get_dirs()
+                except AttributeError:
+                    if isinstance(loader, AppDirectoriesLoader):
+                        dirs = get_app_template_dirs('templates')
+                    else:
+                        dirs = loader.engine.dirs
+                for template_directory in dirs:
                     for root, _, files in walk(template_directory):
                         for template in files:
                             template_path = join(root, template)
