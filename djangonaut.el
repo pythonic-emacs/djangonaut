@@ -584,8 +584,6 @@ from importlib import import_module
 from inspect import findsource, getfile
 from json import dumps
 
-from django.template.backends.django import get_installed_libraries
-
 try:
     from inspect import unwrap
 except ImportError:
@@ -594,12 +592,28 @@ except ImportError:
             func = func.__wrapped__
         return func
 
-libraries = get_installed_libraries()
-libraries['builtin'] = 'django.template.defaultfilters'
+libraries = {}
+libraries['builtin'] = import_module('django.template.defaulttags').register
+
+try:
+    from django.template.backends.django import get_installed_libraries
+
+    for library_name, library_path in get_installed_libraries().items():
+        libraries[library_name] = import_module(library_path).register
+except ImportError:
+    from pkgutil import walk_packages
+    from django.template.base import get_templatetags_modules
+
+    for package_name in get_templatetags_modules():
+        package = import_module(package_name)
+        if hasattr(package, '__path__'):
+            for entry in walk_packages(package.__path__, package.__name__ + '.'):
+                module = import_module(entry[1])
+                if hasattr(module, 'register'):
+                    libraries[entry[1][len(package_name) + 1:]] = module.register
 
 template_filters = {}
-for library_name, library_path in libraries.items():
-    library = import_module(library_path).register
+for library_name, library in libraries.items():
     for filter_name, filter in library.filters.items():
         filter = unwrap(filter)
         template_filters[library_name + '.' + filter_name] = [getfile(filter), findsource(filter)[1]]
