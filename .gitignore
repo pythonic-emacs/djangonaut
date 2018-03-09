@@ -2,3 +2,4 @@
 .cask/
 testproject/
 .tox/
+*.elc
