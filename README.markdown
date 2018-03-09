@@ -1,4 +1,4 @@
-# <img align="right" src="pics/django.png" height="150" width="150"> Djangonaut
+# <img align="right" src="pics/django.png" height="150" width="150"> Djangonaut [![Emacs](https://img.shields.io/badge/Emacs-25-8e44bd.svg)](https://www.gnu.org/software/emacs/) [![Build Status](https://travis-ci.org/proofit404/djangonaut.svg?branch=master)](https://travis-ci.org/proofit404/djangonaut)
 
 Emacs minor mode for Django.
 
