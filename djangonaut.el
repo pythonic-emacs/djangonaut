@@ -40,7 +40,7 @@ from __future__ import print_function
 from sys import path
 
 print('\\n'.join(path))
-")
+" "Python source code to get PYTHONPATH.")
 
 (defvar djangonaut-get-project-root-code "
 from __future__ import print_function
@@ -55,7 +55,7 @@ package = import_module(package_name)
 project_root = dirname(dirname(package.__file__))
 
 print(project_root, end='')
-")
+" "Python source code to get project root.")
 
 (defvar djangonaut-get-commands-code "
 from __future__ import print_function
@@ -71,7 +71,7 @@ from django.core.management import get_commands
 commands = list(get_commands().keys())
 
 print(dumps(commands), end='')
-")
+" "Python source code to get commands.")
 
 (defvar djangonaut-get-command-definitions-code "
 from __future__ import print_function
@@ -93,7 +93,7 @@ for command_name, module_name in get_commands().items():
     commands[command_name] = [getfile(command), findsource(command)[1]]
 
 print(dumps(commands), end='')
-")
+" "Python source code to get command definitions.")
 
 (defvar djangonaut-get-command-arguments-code "
 from __future__ import print_function
@@ -169,7 +169,7 @@ command = module.Command()
 command.add_arguments(Parser)
 
 print(dumps(arguments), end='')
-")
+" "Python source code to get command arguments.")
 
 (defvar djangonaut-get-app-paths-code "
 from __future__ import print_function
@@ -183,7 +183,7 @@ from json import dumps
 paths = {app.label: app.path for app in apps.get_app_configs()}
 
 print(dumps(paths), end='')
-")
+" "Python source code to get app paths.")
 
 (defvar djangonaut-get-admin-classes-code "
 from __future__ import print_function
@@ -212,7 +212,7 @@ for site in all_sites:
         admin_classes[str(admin_instance)] = [getfile(admin_class), findsource(admin_class)[1]]
 
 print(dumps(admin_classes), end='')
-")
+" "Python source code to get admin classes.")
 
 (defvar djangonaut-get-models-code "
 from __future__ import print_function
@@ -227,7 +227,7 @@ from json import dumps
 models = {model._meta.app_label + '.' + model.__name__: [getfile(model), findsource(model)[1]] for model in apps.get_models()}
 
 print(dumps(models), end='')
-")
+" "Python source code to get models.")
 
 (defvar djangonaut-get-model-managers-code "
 from __future__ import print_function
@@ -249,7 +249,7 @@ for obj in get_objects():
         managers[name] = [getfile(obj), findsource(obj)[1]]
 
 print(dumps(managers), end='')
-")
+" "Python source code to get model managers.")
 
 (defvar djangonaut-get-migrations-code "
 from __future__ import print_function
@@ -273,7 +273,7 @@ for (label, module_name), migration in sorted(loader.disk_migrations.items()):
     migrations[name] = [getfile(Migration), findsource(Migration)[1]]
 
 print(dumps(migrations), end='')
-")
+" "Python source code to get migrations.")
 
 (defvar djangonaut-get-sql-functions-code "
 from __future__ import print_function
@@ -295,7 +295,7 @@ for obj in get_objects():
         functions[name] = [getfile(obj), findsource(obj)[1]]
 
 print(dumps(functions), end='')
-")
+" "Python source code to get sql functions.")
 
 (defvar djangonaut-get-signal-receivers-code "
 from __future__ import print_function
@@ -323,7 +323,7 @@ for obj in get_objects():
             receivers[name] = [getfile(receiver), findsource(receiver)[1]]
 
 print(dumps(receivers), end='')
-")
+" "Python source code to get signal receivers.")
 
 (defvar djangonaut-get-drf-serializers-code "
 from __future__ import print_function
@@ -348,7 +348,7 @@ for obj in get_objects():
         serializers[name] = [getfile(obj), findsource(obj)[1]]
 
 print(dumps(serializers), end='')
-")
+" "Python source code to get drf serializers.")
 
 (defvar djangonaut-get-drf-permissions-code "
 from __future__ import print_function
@@ -373,7 +373,7 @@ for obj in get_objects():
         permissions[name] = [getfile(obj), findsource(obj)[1]]
 
 print(dumps(permissions), end='')
-")
+" "Python source code to get drf permissions.")
 
 (defvar djangonaut-get-views-code "
 from __future__ import print_function
@@ -439,7 +439,7 @@ def collect_views(resolver):
 collect_views(get_resolver(get_urlconf()))
 
 print(dumps(views), end='')
-")
+" "Python source code to get views.")
 
 (defvar djangonaut-get-url-modules-code "
 from __future__ import print_function
@@ -481,7 +481,7 @@ def collect_url_modules(conf):
 collect_url_modules(get_resolver(get_urlconf()))
 
 print(dumps(url_modules), end='')
-")
+" "Python source code to get url modules.")
 
 (defvar djangonaut-get-templates-code "
 from __future__ import print_function
@@ -524,7 +524,7 @@ for engine in engines.all():
                                 templates.setdefault(template_path[len(template_directory) + 1:], template_path)
 
 print(dumps(templates), end='')
-")
+" "Python source code to get templates.")
 
 (defvar djangonaut-get-template-tags-code "
 from __future__ import print_function
@@ -579,7 +579,7 @@ for library_name, library in libraries.items():
             template_tags[library_name + '.' + tag_name] = [getfile(tag), findsource(tag)[1]]
 
 print(dumps(template_tags), end='')
-")
+" "Python source code to get template tags.")
 
 (defvar djangonaut-get-template-filters-code "
 from __future__ import print_function
@@ -627,7 +627,7 @@ for library_name, library in libraries.items():
         template_filters[library_name + '.' + filter_name] = [getfile(filter), findsource(filter)[1]]
 
 print(dumps(template_filters), end='')
-")
+" "Python source code to get template filters.")
 
 (defvar djangonaut-get-static-files-code "
 from __future__ import print_function
@@ -648,7 +648,7 @@ for finder in get_finders():
         staticfiles.setdefault(path, storage.path(path))
 
 print(dumps(staticfiles), end='')
-")
+" "Python source code to get static files.")
 
 (defvar djangonaut-get-settings-path-code "
 from __future__ import print_function
@@ -661,7 +661,7 @@ module = import_module(settings_module)
 settings_path = module.__file__
 
 print(settings_path, end='')
-")
+" "Python source code to get settings path.")
 
 (defvar djangonaut-app-paths-history nil)
 
@@ -696,6 +696,7 @@ print(settings_path, end='')
 (defvar djangonaut-static-files-history nil)
 
 (defun djangonaut-get-pythonpath ()
+  "Execute and parse python code to get PYTHONPATH."
   (split-string
    (with-output-to-string
      (with-current-buffer
@@ -705,6 +706,7 @@ print(settings_path, end='')
    nil t))
 
 (defun djangonaut-get-project-root ()
+  "Execute and parse python code to get project root."
   (with-output-to-string
     (with-current-buffer
         standard-output
@@ -712,6 +714,7 @@ print(settings_path, end='')
                      :args (list "-c" djangonaut-get-project-root-code)))))
 
 (defun djangonaut-call (code &rest args)
+  "Execute python CODE with ARGS.  Show errors if occurs."
   (let (exit-code output)
     (setq output
           (with-output-to-string
@@ -724,6 +727,7 @@ print(settings_path, end='')
     output))
 
 (defun djangonaut-read (str)
+  "Read JSON from Python process output STR."
   (condition-case err
       (let ((result (json-read-from-string str)))
         (unless (listp result)
@@ -733,6 +737,7 @@ print(settings_path, end='')
      (djangonaut-show-error str (error-message-string err)))))
 
 (defun djangonaut-show-error (output error-message)
+  "Prepare and show OUTPUT in the ERROR-MESSAGE buffer."
   (let* ((buffer (get-buffer-create "*Django*"))
          (process (get-buffer-process buffer)))
     (when (and process (process-live-p process))
@@ -748,6 +753,10 @@ print(settings_path, end='')
       (error error-message))))
 
 (defun djangonaut-find-file (func prompt collection hist)
+  "Ask user to select some name and open its definition.
+
+FUNC is function to open file.  PROMPT and COLLECTION stands for
+user input.  HIST is a variable to store history of choices."
   (let* ((key (intern (completing-read prompt (mapcar 'symbol-name (mapcar 'car collection)) nil t nil hist)))
          (value (cdr (assoc key collection))))
     (when (pythonic-remote-p)
@@ -755,6 +764,10 @@ print(settings_path, end='')
     (apply func value nil)))
 
 (defun djangonaut-find-file-and-line (func prompt collection hist)
+  "Ask user to select some name and open its definition at the line number.
+
+FUNC is function to open file.  PROMPT and COLLECTION stands for
+user input.  HIST is a variable to store history of choices."
   (let* ((key (intern (completing-read prompt (mapcar 'symbol-name (mapcar 'car collection)) nil t nil hist)))
          (code (cdr (assoc key collection)))
          (value (elt code 0))
@@ -766,64 +779,84 @@ print(settings_path, end='')
     (forward-line lineno)))
 
 (defun djangonaut-get-commands ()
+  "Execute and parse python code to get commands."
   (let ((json-array-type 'list))
     (djangonaut-read (djangonaut-call djangonaut-get-commands-code))))
 
 (defun djangonaut-get-command-definitions ()
+  "Execute and parse python code to get command definitions."
   (djangonaut-read (djangonaut-call djangonaut-get-command-definitions-code)))
 
 (defun djangonaut-get-command-arguments (command)
+  "Execute and parse python code to get COMMAND arguments."
   (djangonaut-read (djangonaut-call djangonaut-get-command-arguments-code command)))
 
 (defun djangonaut-get-app-paths ()
+  "Execute and parse python code to get app paths."
   (djangonaut-read (djangonaut-call djangonaut-get-app-paths-code)))
 
 (defun djangonaut-get-admin-classes ()
+  "Execute and parse python code to get admin classes."
   (djangonaut-read (djangonaut-call djangonaut-get-admin-classes-code)))
 
 (defun djangonaut-get-models ()
+  "Execute and parse python code to get models."
   (djangonaut-read (djangonaut-call djangonaut-get-models-code)))
 
 (defun djangonaut-get-model-managers ()
+  "Execute and parse python code to get model managers."
   (djangonaut-read (djangonaut-call djangonaut-get-model-managers-code)))
 
 (defun djangonaut-get-migrations ()
+  "Execute and parse python code to get migrations."
   (djangonaut-read (djangonaut-call djangonaut-get-migrations-code)))
 
 (defun djangonaut-get-sql-functions ()
+  "Execute and parse python code to get sql functions."
   (djangonaut-read (djangonaut-call djangonaut-get-sql-functions-code)))
 
 (defun djangonaut-get-signal-receivers ()
+  "Execute and parse python code to get signal receivers."
   (djangonaut-read (djangonaut-call djangonaut-get-signal-receivers-code)))
 
 (defun djangonaut-get-drf-serializers ()
+  "Execute and parse python code to get drf serializers."
   (djangonaut-read (djangonaut-call djangonaut-get-drf-serializers-code)))
 
 (defun djangonaut-get-drf-permissions ()
+  "Execute and parse python code to get drf permissions."
   (djangonaut-read (djangonaut-call djangonaut-get-drf-permissions-code)))
 
 (defun djangonaut-get-views ()
+  "Execute and parse python code to get views."
   (djangonaut-read (djangonaut-call djangonaut-get-views-code)))
 
 (defun djangonaut-get-url-modules ()
+  "Execute and parse python code to get url modules."
   (djangonaut-read (djangonaut-call djangonaut-get-url-modules-code)))
 
 (defun djangonaut-get-templates ()
+  "Execute and parse python code to get templates."
   (djangonaut-read (djangonaut-call djangonaut-get-templates-code)))
 
 (defun djangonaut-get-template-tags ()
+  "Execute and parse python code to get template tags."
   (djangonaut-read (djangonaut-call djangonaut-get-template-tags-code)))
 
 (defun djangonaut-get-template-filters ()
+  "Execute and parse python code to get template filters."
   (djangonaut-read (djangonaut-call djangonaut-get-template-filters-code)))
 
 (defun djangonaut-get-static-files ()
+  "Execute and parse python code to get static files."
   (djangonaut-read (djangonaut-call djangonaut-get-static-files-code)))
 
 (defun djangonaut-get-settings-path ()
+  "Execute and parse python code to get settings path."
   (djangonaut-call djangonaut-get-settings-path-code))
 
 (defun djangonaut-run-management-command-dwim ()
+  "Run management command."
   (interactive)
   (call-interactively
    (if current-prefix-arg
@@ -831,6 +864,7 @@ print(settings_path, end='')
      'djangonaut-run-management-command)))
 
 (defun djangonaut-run-management-command (&rest command)
+  "Run management COMMAND in the comint buffer."
   (interactive (split-string (completing-read "Command: " (djangonaut-get-commands) nil nil nil 'djangonaut-commands-history) " " t))
   (let* ((buffer (get-buffer-create "*Django*"))
          (process (get-buffer-process buffer)))
@@ -850,7 +884,8 @@ print(settings_path, end='')
       (pop-to-buffer buffer))))
 
 (defun djangonaut-run-popup-management-command (command)
-  (interactive (list (completing-read "Command: " (djangonaut-get-commands) nil t nil 'djangonaut-commands-history)))
+  "Run management COMMAND with arguments specified in the popup buffer."
+  (interactive (list (completing-read "Popup Command: " (djangonaut-get-commands) nil t nil 'djangonaut-commands-history)))
   (let* ((arguments (djangonaut-get-command-arguments command))
          (func-name (intern (concat "djangonaut-run-" (s-replace "_" "-" command) "-popup")))
          (args-name (intern (concat "djangonaut-run-" (s-replace "_" "-" command) "-arguments")))
@@ -866,134 +901,167 @@ print(settings_path, end='')
     (funcall func)))
 
 (defun djangonaut-dired-installed-apps ()
+  "Open application directory in the dired buffer."
   (interactive)
   (djangonaut-find-file #'dired "App: " (djangonaut-get-app-paths) 'djangonaut-app-paths-history))
 
 (defun djangonaut-dired-installed-apps-other-window ()
+  "Open application directory in the dired buffer in the other window."
   (interactive)
   (djangonaut-find-file #'dired-other-window "App: " (djangonaut-get-app-paths) 'djangonaut-app-paths-history))
 
 (defun djangonaut-find-management-command ()
+  "Open definition of the Django management command."
   (interactive)
   (djangonaut-find-file-and-line #'find-file "Command: " (djangonaut-get-command-definitions) 'djangonaut-commands-history))
 
 (defun djangonaut-find-management-command-other-window ()
+  "Open definition of the Django management command in other window."
   (interactive)
   (djangonaut-find-file-and-line #'find-file-other-window "Command: " (djangonaut-get-command-definitions) 'djangonaut-commands-history))
 
 (defun djangonaut-find-admin-class ()
+  "Open definition of the Django admin class."
   (interactive)
   (djangonaut-find-file-and-line #'find-file "Admin Class: " (djangonaut-get-admin-classes) 'djangonaut-admin-classes-history))
 
 (defun djangonaut-find-admin-class-other-window ()
+  "Open definition of the Django admin class in the other window."
   (interactive)
   (djangonaut-find-file-and-line #'find-file-other-window "Admin Class: " (djangonaut-get-admin-classes) 'djangonaut-admin-classes-history))
 
 (defun djangonaut-find-model ()
+  "Open definition of the Django model."
   (interactive)
   (djangonaut-find-file-and-line #'find-file "Model: " (djangonaut-get-models) 'djangonaut-models-history))
 
 (defun djangonaut-find-model-other-window ()
+  "Open definition of the Django model in the other window."
   (interactive)
   (djangonaut-find-file-and-line #'find-file-other-window "Model: " (djangonaut-get-models) 'djangonaut-models-history))
 
 (defun djangonaut-find-model-manager ()
+  "Open definition of the Django model manager."
   (interactive)
   (djangonaut-find-file-and-line #'find-file "Model Manager: " (djangonaut-get-model-managers) 'djangonaut-model-managers-history))
 
 (defun djangonaut-find-model-manager-other-window ()
+  "Open definition of the Django model manager in the other window."
   (interactive)
   (djangonaut-find-file-and-line #'find-file-other-window "Model Manager: " (djangonaut-get-model-managers) 'djangonaut-model-managers-history))
 
 (defun djangonaut-find-migration ()
+  "Open definition of the Django migration."
   (interactive)
   (djangonaut-find-file-and-line #'find-file "Migration: " (djangonaut-get-migrations) 'djangonaut-migrations-history))
 
 (defun djangonaut-find-migration-other-window ()
+  "Open definition of the Django migration in the other window."
   (interactive)
   (djangonaut-find-file-and-line #'find-file-other-window "Migration: " (djangonaut-get-migrations) 'djangonaut-migrations-history))
 
 (defun djangonaut-find-sql-function ()
+  "Open definition of the Django sql function."
   (interactive)
   (djangonaut-find-file-and-line #'find-file "SQL Function: " (djangonaut-get-sql-functions) 'djangonaut-sql-functions-history))
 
 (defun djangonaut-find-sql-function-other-window ()
+  "Open definition of the Django sql function in the other window."
   (interactive)
   (djangonaut-find-file-and-line #'find-file-other-window "SQL Function: " (djangonaut-get-sql-functions) 'djangonaut-sql-functions-history))
 
 (defun djangonaut-find-signal-receiver ()
+  "Open definition of the Django signal receiver."
   (interactive)
   (djangonaut-find-file-and-line #'find-file "Signal Receiver: " (djangonaut-get-signal-receivers) 'djangonaut-signal-receivers-history))
 
 (defun djangonaut-find-signal-receiver-other-window ()
+  "Open definition of the Django signal receiver in the other window."
   (interactive)
   (djangonaut-find-file-and-line #'find-file-other-window "Signal Receiver: " (djangonaut-get-signal-receivers) 'djangonaut-signal-receivers-history))
 
 (defun djangonaut-find-drf-serializer ()
+  "Open definition of the Django drf serializer."
   (interactive)
   (djangonaut-find-file-and-line #'find-file "Serializer: " (djangonaut-get-drf-serializers) 'djangonaut-drf-serializers-history))
 
 (defun djangonaut-find-drf-serializer-other-window ()
+  "Open definition of the Django drf serializer in the other window."
   (interactive)
   (djangonaut-find-file-and-line #'find-file-other-window "Serializer: " (djangonaut-get-drf-serializers) 'djangonaut-drf-serializers-history))
 
 (defun djangonaut-find-drf-permission ()
+  "Open definition of the Django drf permission."
   (interactive)
   (djangonaut-find-file-and-line #'find-file "Permission: " (djangonaut-get-drf-permissions) 'djangonaut-drf-permissions-history))
 
 (defun djangonaut-find-drf-permission-other-window ()
+  "Open definition of the Django drf permission in the other window."
   (interactive)
   (djangonaut-find-file-and-line #'find-file-other-window "Permission: " (djangonaut-get-drf-permissions) 'djangonaut-drf-permissions-history))
 
 (defun djangonaut-find-view ()
+  "Open definition of the Django view."
   (interactive)
   (djangonaut-find-file-and-line #'find-file "View: " (djangonaut-get-views) 'djangonaut-views-history))
 
 (defun djangonaut-find-view-other-window ()
+  "Open definition of the Django view in the other window."
   (interactive)
   (djangonaut-find-file-and-line #'find-file-other-window "View: " (djangonaut-get-views) 'djangonaut-views-history))
 
 (defun djangonaut-find-url-module ()
+  "Open definition of the Django url module."
   (interactive)
   (djangonaut-find-file #'find-file "URL Module: " (djangonaut-get-url-modules) 'djangonaut-url-modules-history))
 
 (defun djangonaut-find-url-module-other-window ()
+  "Open definition of the Django url module in the other window."
   (interactive)
   (djangonaut-find-file #'find-file-other-window "URL Module: " (djangonaut-get-url-modules) 'djangonaut-url-modules-history))
 
 (defun djangonaut-find-template ()
+  "Open definition of the Django template."
   (interactive)
   (djangonaut-find-file #'find-file "Template: " (djangonaut-get-templates) 'djangonaut-templates-history))
 
 (defun djangonaut-find-template-other-window ()
+  "Open definition of the Django template in the other window."
   (interactive)
   (djangonaut-find-file #'find-file-other-window "Template: " (djangonaut-get-templates) 'djangonaut-templates-history))
 
 (defun djangonaut-find-template-tag ()
+  "Open definition of the Django template tag."
   (interactive)
   (djangonaut-find-file-and-line #'find-file "Template Tag: " (djangonaut-get-template-tags) 'djangonaut-template-tags-history))
 
 (defun djangonaut-find-template-tag-other-window ()
+  "Open definition of the Django template tag in the other window."
   (interactive)
   (djangonaut-find-file-and-line #'find-file-other-window "Template Tag: " (djangonaut-get-template-tags) 'djangonaut-template-tags-history))
 
 (defun djangonaut-find-template-filter ()
+  "Open definition of the Django template filter."
   (interactive)
   (djangonaut-find-file-and-line #'find-file "Template Filter: " (djangonaut-get-template-filters) 'djangonaut-template-filters-history))
 
 (defun djangonaut-find-template-filter-other-window ()
+  "Open definition of the Django template filter in the other window."
   (interactive)
   (djangonaut-find-file-and-line #'find-file-other-window "Template Filter: " (djangonaut-get-template-filters) 'djangonaut-template-filters-history))
 
 (defun djangonaut-find-static-file ()
+  "Open definition of the Django static file."
   (interactive)
   (djangonaut-find-file #'find-file "Static File: " (djangonaut-get-static-files) 'djangonaut-static-files-history))
 
 (defun djangonaut-find-static-file-other-window ()
+  "Open definition of the Django static file in the other window."
   (interactive)
   (djangonaut-find-file #'find-file-other-window "Static File: " (djangonaut-get-static-files) 'djangonaut-static-files-history))
 
 (defun djangonaut-find-settings-module ()
+  "Open definition of the Django settings module."
   (interactive)
   (let ((filename (djangonaut-get-settings-path)))
     (when (pythonic-remote-p)
@@ -1001,6 +1069,7 @@ print(settings_path, end='')
     (find-file filename)))
 
 (defun djangonaut-find-settings-module-other-window ()
+  "Open definition of the Django settings module in the other window."
   (interactive)
   (let ((filename (djangonaut-get-settings-path)))
     (when (pythonic-remote-p)
@@ -1050,7 +1119,9 @@ print(settings_path, end='')
 
 ;;;###autoload
 (define-minor-mode djangonaut-mode
-  ""
+  "Minor mode to interact with Django project.
+
+\\{djangonaut-mode-map}"
   :lighter djangonaut-mode-lighter
   :keymap djangonaut-mode-map)
 
@@ -1063,7 +1134,8 @@ print(settings_path, end='')
           (dolist (path (djangonaut-get-pythonpath))
             (when (or (f-same? path directory)
                       (f-ancestor-of? path directory))
-              (djangonaut-mode 1))))))))
+              (djangonaut-mode 1)))))))
+  :require 'djangonaut)
 
 (provide 'djangonaut)
 
