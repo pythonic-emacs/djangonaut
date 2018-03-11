@@ -2,6 +2,35 @@
 
 Emacs minor mode for Django.
 
+## Features
+
+Djangonaut mode provides following features
+
+* intelligent navigation in a Django project
+* management commands execution
+* works transparently with vagrant, docker and remote hosts
+
+## Supported Python Versions
+
+2.7, 3.4, 3.5, 3.6
+
+## Supported Django Versions
+
+1.8, 1.9, 1.10, 1.11, 2.0
+
+## Installation
+
+All you need to do is install the package from
+[Melpa](https://melpa.org/)
+
+    M-x package-install RET djangonaut RET
+
+## Configuration
+
+To be continued...
+
+## Usage
+
 #### Run management command
 
 ![Screencast of run management command](pics/run-management-command.gif)
