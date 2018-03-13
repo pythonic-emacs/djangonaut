@@ -2,6 +2,14 @@
 
 Emacs minor mode for Django.
 
+This package is based on the introspection of your Django project.  It
+executes Python code to get all necessary information about model,
+views, and templates inside `INSTALLED_APPS`.  Works the same way for
+applications written by you and for third-party code installed with
+`pip`.  No more broken code conventions.  No more flaky guesses about
+your project layout.  If Django can understand it, Djangonaut can
+understand it.
+
 ## Features
 
 Djangonaut mode provides following features
