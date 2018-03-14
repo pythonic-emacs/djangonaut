@@ -35,4 +35,6 @@
 
 (blink-cursor-mode -1)
 
+(helm-mode 1)
+
 ;;; init.el ends here

@@ -7,4 +7,5 @@
  (depends-on "docker-tramp")
  (depends-on "gif-screencast")
  (depends-on "ert-runner")
- (depends-on "zenburn-theme"))
+ (depends-on "zenburn-theme")
+ (depends-on "helm"))
