@@ -14,7 +14,7 @@ understand it.
 
 ## Features
 
-<img align="middle" src="pics/find-model-and-view.gif">
+<div align="center"><img src="pics/find-model-and-view.gif"></div>
 
 Djangonaut mode provides following features
 
@@ -162,4 +162,4 @@ Use <kbd>C-c r !</kbd> to run management command in the comint buffer.
 You can call it with prefix argument `C-u` to set command arguments
 via interactive menu.
 
-<img align="middle" src="pics/run-management-command-popup.gif">
+<div align="center"><img src="pics/run-management-command-popup.gif"></div>
