@@ -23,7 +23,7 @@
 
 (setq python-shell-interpreter "/docker:root@olympia_web_1:/usr/local/bin/python")
 
-(load-theme 'django t)
+(load-theme 'zenburn t)
 
 (add-to-list 'default-frame-alist '(font . "Liberation Mono-14"))
 
@@ -32,5 +32,7 @@
 (scroll-bar-mode -1)
 
 (tool-bar-mode -1)
+
+(blink-cursor-mode -1)
 
 ;;; init.el ends here
