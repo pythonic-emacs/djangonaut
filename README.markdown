@@ -14,6 +14,8 @@ understand it.
 
 ## Features
 
+<img align="middle" src="pics/find-model-and-view.gif">
+
 Djangonaut mode provides following features
 
 * intelligent navigation in a Django project
@@ -122,64 +124,42 @@ directly or with compose file environment key
 
 ## Usage
 
-#### Run management command
+If you open file or directory related to the project, you should see
+`Django` minor mode is activated for this buffer.  Note, you should
+open project files over tramp method, if you use remote interpreter.
+For example, open `/docker:root@container:/code/manage.py` instead of
+`manage.py` on the local host.
 
-![Screencast of run management command](pics/run-management-command.gif)
+#### Project navigation
 
-![Screencast of run management command popup](pics/run-management-command-popup.gif)
+| Key                  | Command                            |
+|----------------------|------------------------------------|
+| <kbd>C-c r M</kbd>   | djangonaut-find-model-manager      |
+| <kbd>C-c r S</kbd>   | djangonaut-find-settings-module    |
+| <kbd>C-c r a</kbd>   | djangonaut-find-admin-class        |
+| <kbd>C-c r c</kbd>   | djangonaut-find-management-command |
+| <kbd>C-c r f</kbd>   | djangonaut-find-template-filter    |
+| <kbd>C-c r g</kbd>   | djangonaut-find-template-tag       |
+| <kbd>C-c r i</kbd>   | djangonaut-dired-installed-apps    |
+| <kbd>C-c r j</kbd>   | djangonaut-find-static-file        |
+| <kbd>C-c r m</kbd>   | djangonaut-find-model              |
+| <kbd>C-c r n</kbd>   | djangonaut-find-migration          |
+| <kbd>C-c r p</kbd>   | djangonaut-find-drf-permission     |
+| <kbd>C-c r q</kbd>   | djangonaut-find-sql-function       |
+| <kbd>C-c r r</kbd>   | djangonaut-find-signal-receiver    |
+| <kbd>C-c r s</kbd>   | djangonaut-find-drf-serializer     |
+| <kbd>C-c r t</kbd>   | djangonaut-find-template           |
+| <kbd>C-c r u</kbd>   | djangonaut-find-url-module         |
+| <kbd>C-c r v</kbd>   | djangonaut-find-view               |
 
-#### Dired installed apps
+All navigation commands can open definitions in the other window.  For
+example use <kbd>C-c r 4 m</kbd> to open model definition in the other
+window.
 
-![Screencast of dired installed apps command](pics/dired-installed-apps.gif)
+#### Run management commands
 
-#### Find management command
+Use <kbd>C-c r !</kbd> to run management command in the comint buffer.
+You can call it with prefix argument `C-u` to set command arguments
+via interactive menu.
 
-![Screencast of find management command command](pics/find-management-command.gif)
-
-#### Find model
-
-![Screencast of find model command](pics/find-model.gif)
-
-#### Find model manager
-
-![Screencast of find model manager command](pics/find-model-manager.gif)
-
-#### Find migration
-
-![Screencast of find migration command](pics/find-migration.gif)
-
-#### Find sql function
-
-![Screencast of find sql function command](pics/find-sql-function.gif)
-
-#### Find signal receiver
-
-![Screencast of find signal receiver command](pics/find-signal-receiver.gif)
-
-#### Find view
-
-![Screencast of find view command](pics/find-view.gif)
-
-#### Find url module
-
-![Screencast of find url module command](pics/find-url-module.gif)
-
-#### Find template
-
-![Screencast of find template command](pics/find-template.gif)
-
-#### Find template tag
-
-![Screencast of find template tag command](pics/find-template-tag.gif)
-
-#### Find template filter
-
-![Screencast of find template filter command](pics/find-template-filter.gif)
-
-#### Find static file
-
-![Screencast of find static file command](pics/find-static-file.gif)
-
-#### Find settings module
-
-![Screencast of find settings module command](pics/find-settings-module.gif)
+<img align="middle" src="pics/run-management-command-popup.gif">
