@@ -13,6 +13,10 @@
   (add-to-list 'load-path source-directory)
   (setq gif-screencast-output-directory (f-join source-directory "pics")))
 
+(with-eval-after-load 'gif-screencast
+  (define-key gif-screencast-mode-map (kbd "<f8>") 'gif-screencast-toggle-pause)
+  (define-key gif-screencast-mode-map (kbd "<f9>") 'gif-screencast-stop))
+
 (require 'djangonaut)
 
 (global-djangonaut-mode)
