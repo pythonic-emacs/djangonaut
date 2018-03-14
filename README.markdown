@@ -37,7 +37,88 @@ All you need to do is install the package from
 
 ## Configuration
 
-To be continued...
+Djangonaut minor mode available in all buffers related to current
+django project (python and html files, dired buffers).  First of all
+enable minor mode:
+
+    M-x global-djangonaut-mode RET
+
+Now you need to configure Emacs environment to run your django
+project.  For example, `run-python` command should be able to run
+django shell.  Emacs require to know three things:
+
+* path to the python interpreter or virtual environment
+* location of the project
+* django settings module of your project
+
+#### Path to the interpreter
+
+Django itself is a python package you usually install with `pip`.
+If you install Django into your system globally with `apt` or `yum`
+you can skip this section.  But most of times python packages are
+installed somewhere else like virtual environment on your host, inside
+Docker container or virtual machine orchestrated by Vagrant.
+
+If you setup project inside virtual environment, use this command to
+tell Emacs where it can find an interpreter:
+
+    M-x pythonic-activate RET /path/to/your/venv/ RET
+
+If you use Docker or Docker Compose for development, setup path to the
+interpreter directly.  Also you need to install
+[docker-tramp](https://github.com/emacs-pe/docker-tramp.el) package to
+use remote interpreter this way.
+
+    M-x set-variable RET python-shell-interpreter RET "/docker:root@container:/usr/local/bin/python"
+
+If you use Vagrant for development, first of all add your ssh key to
+the trusted list in your VM, so you will not be annoyed with password
+prompt pops up frequently.
+
+    ssh-copy-id vagrant@localhost -p 2222
+
+Now you can point Emacs to the remote interpreter this way
+
+    M-x set-variable RET python-shell-interpreter RET "/ssh:vagrant@localhost#2222:/usr/bin/python" RET
+
+#### Path to the project
+
+The key point here - provided python interpreter should be able to
+import modules from your project.  There is a lot of options here.
+You can use [setuptools](https://setuptools.readthedocs.io/en/latest/)
+to wrap your project into proper python package and install it into
+editable mode
+
+    pip install -e .
+
+You can use `pth` file to include project location into interpreter
+import path
+
+    echo $PWD > venv/lib/python3.7/site-packages/project.pth
+
+Or you can use old plain `PYTHONPATH` environment variable to tell
+Emacs where to look for your project
+
+    M-x set-variable RET python-shell-extra-pythonpaths RET '("/path/to/the/project/")
+
+In case you use Docker you can also set this variable directly inside
+container either with command line arguments or via
+[environment](https://docs.docker.com/compose/compose-file/) key of
+the docker compose file
+
+    docker run -e PYTHONPATH=/code/ web django-admin runserver 0.0.0.0:8000
+
+#### Settings module
+
+Also Emacs needs to know your django settings module.  We can provide
+it the same way as we do with project path via environment variable
+
+    M-x set-variable RET python-shell-process-environment RET '("DJANGO_SETTINGS_MODULE=project.settings")
+
+And in the case of docker you can setup this variable inside container
+directly or with compose file environment key
+
+    docker run -e DJANGO_SETTINGS_MODULE=project.settings web ...
 
 ## Usage
 
