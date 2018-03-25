@@ -35,7 +35,7 @@
 (require 'f)
 (require 's)
 
-(defvar djangonaut-keymap-prefix (kbd "C-c r")
+(defvar djangonaut-keymap-prefix (kbd "C-c '")
   "Djangonaut keymap prefix.")
 
 (defvar djangonaut-get-pythonpath-code "

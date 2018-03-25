@@ -134,31 +134,31 @@ For example, open `/docker:root@container:/code/manage.py` instead of
 
 | Key                  | Command                            |
 |----------------------|------------------------------------|
-| <kbd>C-c r M</kbd>   | djangonaut-find-model-manager      |
-| <kbd>C-c r S</kbd>   | djangonaut-find-settings-module    |
-| <kbd>C-c r a</kbd>   | djangonaut-find-admin-class        |
-| <kbd>C-c r c</kbd>   | djangonaut-find-management-command |
-| <kbd>C-c r f</kbd>   | djangonaut-find-template-filter    |
-| <kbd>C-c r g</kbd>   | djangonaut-find-template-tag       |
-| <kbd>C-c r i</kbd>   | djangonaut-dired-installed-apps    |
-| <kbd>C-c r j</kbd>   | djangonaut-find-static-file        |
-| <kbd>C-c r m</kbd>   | djangonaut-find-model              |
-| <kbd>C-c r n</kbd>   | djangonaut-find-migration          |
-| <kbd>C-c r p</kbd>   | djangonaut-find-drf-permission     |
-| <kbd>C-c r q</kbd>   | djangonaut-find-sql-function       |
-| <kbd>C-c r r</kbd>   | djangonaut-find-signal-receiver    |
-| <kbd>C-c r s</kbd>   | djangonaut-find-drf-serializer     |
-| <kbd>C-c r t</kbd>   | djangonaut-find-template           |
-| <kbd>C-c r u</kbd>   | djangonaut-find-url-module         |
-| <kbd>C-c r v</kbd>   | djangonaut-find-view               |
+| <kbd>C-c ' M</kbd>   | djangonaut-find-model-manager      |
+| <kbd>C-c ' S</kbd>   | djangonaut-find-settings-module    |
+| <kbd>C-c ' a</kbd>   | djangonaut-find-admin-class        |
+| <kbd>C-c ' c</kbd>   | djangonaut-find-management-command |
+| <kbd>C-c ' f</kbd>   | djangonaut-find-template-filter    |
+| <kbd>C-c ' g</kbd>   | djangonaut-find-template-tag       |
+| <kbd>C-c ' i</kbd>   | djangonaut-dired-installed-apps    |
+| <kbd>C-c ' j</kbd>   | djangonaut-find-static-file        |
+| <kbd>C-c ' m</kbd>   | djangonaut-find-model              |
+| <kbd>C-c ' n</kbd>   | djangonaut-find-migration          |
+| <kbd>C-c ' p</kbd>   | djangonaut-find-drf-permission     |
+| <kbd>C-c ' q</kbd>   | djangonaut-find-sql-function       |
+| <kbd>C-c ' r</kbd>   | djangonaut-find-signal-receiver    |
+| <kbd>C-c ' s</kbd>   | djangonaut-find-drf-serializer     |
+| <kbd>C-c ' t</kbd>   | djangonaut-find-template           |
+| <kbd>C-c ' u</kbd>   | djangonaut-find-url-module         |
+| <kbd>C-c ' v</kbd>   | djangonaut-find-view               |
 
 All navigation commands can open definitions in the other window.  For
-example use <kbd>C-c r 4 m</kbd> to open model definition in the other
+example use <kbd>C-c ' 4 m</kbd> to open model definition in the other
 window.
 
 #### Run management commands
 
-Use <kbd>C-c r !</kbd> to run management command in the comint buffer.
+Use <kbd>C-c ' !</kbd> to run management command in the comint buffer.
 You can call it with prefix argument `C-u` to set command arguments
 via interactive menu.
 
