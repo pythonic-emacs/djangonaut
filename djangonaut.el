@@ -5,7 +5,7 @@
 ;; Author: Artem Malyshev <proofit404@gmail.com>
 ;; URL: https://github.com/proofit404/djangonaut
 ;; Version: 0.0.1
-;; Package-Requires: ((emacs "25.2") (pythonic "0.1.0") (f "0.20.0") (magit-popup "2.6.0"))
+;; Package-Requires: ((emacs "25.2") (magit-popup "2.6.0") (pythonic "0.1.0") (f "0.20.0") (s "1.12.0"))
 
 ;; This program is free software; you can redistribute it and/or modify
 ;; it under the terms of the GNU General Public License as published by
@@ -33,6 +33,7 @@
 (require 'comint)
 (require 'json)
 (require 'f)
+(require 's)
 
 (defvar djangonaut-keymap-prefix (kbd "C-c r")
   "Djangonaut keymap prefix.")
