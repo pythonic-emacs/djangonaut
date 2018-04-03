@@ -85,7 +85,7 @@ from django.conf import settings
 apps.populate(settings.INSTALLED_APPS)
 
 from importlib import import_module
-from inspect import findsource, getfile
+from inspect import findsource, getsourcefile
 from json import dumps
 
 from django.core.management import get_commands
@@ -94,7 +94,7 @@ commands = {}
 for command_name, module_name in get_commands().items():
     module = import_module(module_name + '.management.commands.' + command_name)
     command = module.Command
-    commands[command_name] = [getfile(command), findsource(command)[1]]
+    commands[command_name] = [getsourcefile(command), findsource(command)[1]]
 
 print(dumps(commands), end='')
 " "Python source code to get command definitions.")
@@ -196,7 +196,7 @@ from django.apps import apps
 from django.conf import settings
 apps.populate(settings.INSTALLED_APPS)
 
-from inspect import findsource, getfile
+from inspect import findsource, getsourcefile
 from json import dumps
 
 try:
@@ -213,7 +213,7 @@ admin_classes = {}
 for site in all_sites:
     for admin_instance in site._registry.values():
         admin_class = admin_instance.__class__
-        admin_classes[str(admin_instance)] = [getfile(admin_class), findsource(admin_class)[1]]
+        admin_classes[str(admin_instance)] = [getsourcefile(admin_class), findsource(admin_class)[1]]
 
 print(dumps(admin_classes), end='')
 " "Python source code to get admin classes.")
@@ -225,10 +225,10 @@ from django.apps import apps
 from django.conf import settings
 apps.populate(settings.INSTALLED_APPS)
 
-from inspect import findsource, getfile
+from inspect import findsource, getsourcefile
 from json import dumps
 
-models = {model._meta.app_label + '.' + model.__name__: [getfile(model), findsource(model)[1]] for model in apps.get_models()}
+models = {model._meta.app_label + '.' + model.__name__: [getsourcefile(model), findsource(model)[1]] for model in apps.get_models()}
 
 print(dumps(models), end='')
 " "Python source code to get models.")
@@ -241,7 +241,7 @@ from django.conf import settings
 apps.populate(settings.INSTALLED_APPS)
 
 from gc import get_objects
-from inspect import findsource, getfile, getmodule, isclass
+from inspect import findsource, getsourcefile, getmodule, isclass
 from json import dumps
 
 from django.db.models import Manager
@@ -250,7 +250,7 @@ managers = {}
 for obj in get_objects():
     if isclass(obj) and issubclass(obj, Manager):
         name = getmodule(obj).__name__ + '.' + obj.__name__
-        managers[name] = [getfile(obj), findsource(obj)[1]]
+        managers[name] = [getsourcefile(obj), findsource(obj)[1]]
 
 print(dumps(managers), end='')
 " "Python source code to get model managers.")
@@ -262,7 +262,7 @@ from django.apps import apps
 from django.conf import settings
 apps.populate(settings.INSTALLED_APPS)
 
-from inspect import findsource, getfile
+from inspect import findsource, getsourcefile
 from json import dumps
 
 from django.db.migrations.loader import MigrationLoader
@@ -274,7 +274,7 @@ migrations = {}
 for (label, module_name), migration in sorted(loader.disk_migrations.items()):
     name = label + '.' + module_name
     Migration = migration.__class__
-    migrations[name] = [getfile(Migration), findsource(Migration)[1]]
+    migrations[name] = [getsourcefile(Migration), findsource(Migration)[1]]
 
 print(dumps(migrations), end='')
 " "Python source code to get migrations.")
@@ -287,7 +287,7 @@ from django.conf import settings
 apps.populate(settings.INSTALLED_APPS)
 
 from gc import get_objects
-from inspect import findsource, getfile, getmodule, isclass
+from inspect import findsource, getsourcefile, getmodule, isclass
 from json import dumps
 
 from django.db.models import Func
@@ -296,7 +296,7 @@ functions = {}
 for obj in get_objects():
     if isclass(obj) and issubclass(obj, Func):
         name = getmodule(obj).__name__ + '.' + obj.__name__
-        functions[name] = [getfile(obj), findsource(obj)[1]]
+        functions[name] = [getsourcefile(obj), findsource(obj)[1]]
 
 print(dumps(functions), end='')
 " "Python source code to get sql functions.")
@@ -309,7 +309,7 @@ from django.conf import settings
 apps.populate(settings.INSTALLED_APPS)
 
 from gc import get_objects
-from inspect import findsource, getfile, getmodule
+from inspect import findsource, getsourcefile, getmodule
 from json import dumps
 from weakref import ReferenceType
 
@@ -324,7 +324,7 @@ for obj in get_objects():
                 if receiver is None:
                     continue
             name = getmodule(receiver).__name__ + '.' + receiver.__name__
-            receivers[name] = [getfile(receiver), findsource(receiver)[1]]
+            receivers[name] = [getsourcefile(receiver), findsource(receiver)[1]]
 
 print(dumps(receivers), end='')
 " "Python source code to get signal receivers.")
@@ -338,7 +338,7 @@ apps.populate(settings.INSTALLED_APPS)
 
 from gc import get_objects
 from importlib import import_module
-from inspect import findsource, getfile, getmodule, isclass
+from inspect import findsource, getsourcefile, getmodule, isclass
 from json import dumps
 
 from rest_framework.serializers import Serializer
@@ -349,7 +349,7 @@ serializers = {}
 for obj in get_objects():
     if isclass(obj) and issubclass(obj, Serializer):
         name = getmodule(obj).__name__ + '.' + obj.__name__
-        serializers[name] = [getfile(obj), findsource(obj)[1]]
+        serializers[name] = [getsourcefile(obj), findsource(obj)[1]]
 
 print(dumps(serializers), end='')
 " "Python source code to get drf serializers.")
@@ -363,7 +363,7 @@ apps.populate(settings.INSTALLED_APPS)
 
 from gc import get_objects
 from importlib import import_module
-from inspect import findsource, getfile, getmodule, isclass
+from inspect import findsource, getsourcefile, getmodule, isclass
 from json import dumps
 
 from rest_framework.permissions import BasePermission
@@ -374,7 +374,7 @@ permissions = {}
 for obj in get_objects():
     if isclass(obj) and issubclass(obj, BasePermission):
         name = getmodule(obj).__name__ + '.' + obj.__name__
-        permissions[name] = [getfile(obj), findsource(obj)[1]]
+        permissions[name] = [getsourcefile(obj), findsource(obj)[1]]
 
 print(dumps(permissions), end='')
 " "Python source code to get drf permissions.")
@@ -386,7 +386,7 @@ from django.apps import apps
 from django.conf import settings
 apps.populate(settings.INSTALLED_APPS)
 
-from inspect import findsource, getfile, getmodule, ismethod
+from inspect import findsource, getsourcefile, getmodule, ismethod
 from json import dumps
 
 try:
@@ -438,7 +438,7 @@ def collect_views(resolver):
                     name = getmodule(view).__name__ + '.' + view.__self__.__class__.__name__ + '.' + view.__name__
                 else:
                     name = getmodule(view).__name__ + '.' + view.__name__
-            views[name] = [getfile(view), findsource(view)[1]]
+            views[name] = [getsourcefile(view), findsource(view)[1]]
 
 collect_views(get_resolver(get_urlconf()))
 
@@ -538,7 +538,7 @@ from django.conf import settings
 apps.populate(settings.INSTALLED_APPS)
 
 from importlib import import_module
-from inspect import findsource, getfile
+from inspect import findsource, getsourcefile
 from json import dumps
 
 try:
@@ -574,13 +574,13 @@ for library_name, library in libraries.items():
     for tag_name, tag in library.tags.items():
         tag = unwrap(tag)
         try:
-            template_tags[library_name + '.' + tag_name] = [getfile(tag), findsource(tag)[1]]
+            template_tags[library_name + '.' + tag_name] = [getsourcefile(tag), findsource(tag)[1]]
         except TypeError:
             # This is Django 1.8 and we met functools.partial result.  We take class defined
             # in the decorator from bound keyword arguments.  This class has a method with a
             # closure where we can find decorated function.
             tag = tag.keywords['node_class'].render.__closure__[-1].cell_contents
-            template_tags[library_name + '.' + tag_name] = [getfile(tag), findsource(tag)[1]]
+            template_tags[library_name + '.' + tag_name] = [getsourcefile(tag), findsource(tag)[1]]
 
 print(dumps(template_tags), end='')
 " "Python source code to get template tags.")
@@ -593,7 +593,7 @@ from django.conf import settings
 apps.populate(settings.INSTALLED_APPS)
 
 from importlib import import_module
-from inspect import findsource, getfile
+from inspect import findsource, getsourcefile
 from json import dumps
 
 try:
@@ -628,7 +628,7 @@ template_filters = {}
 for library_name, library in libraries.items():
     for filter_name, filter in library.filters.items():
         filter = unwrap(filter)
-        template_filters[library_name + '.' + filter_name] = [getfile(filter), findsource(filter)[1]]
+        template_filters[library_name + '.' + filter_name] = [getsourcefile(filter), findsource(filter)[1]]
 
 print(dumps(template_filters), end='')
 " "Python source code to get template filters.")
@@ -658,11 +658,12 @@ print(dumps(staticfiles), end='')
 from __future__ import print_function
 
 from importlib import import_module
+from inspect import getsourcefile
 from os import environ
 
 settings_module = environ['DJANGO_SETTINGS_MODULE']
 module = import_module(settings_module)
-settings_path = module.__file__
+settings_path = getsourcefile(module)
 
 print(settings_path, end='')
 " "Python source code to get settings path.")
