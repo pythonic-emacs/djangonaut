@@ -706,6 +706,7 @@ print(settings_path, end='')
    (with-output-to-string
      (with-current-buffer
          standard-output
+       (hack-dir-local-variables-non-file-buffer)
        (call-pythonic :buffer standard-output
                       :args (list "-c" djangonaut-get-pythonpath-code))))
    nil t))
@@ -715,6 +716,7 @@ print(settings_path, end='')
   (with-output-to-string
     (with-current-buffer
         standard-output
+      (hack-dir-local-variables-non-file-buffer)
       (call-pythonic :buffer standard-output
                      :args (list "-c" djangonaut-get-project-root-code)))))
 
@@ -725,6 +727,7 @@ print(settings_path, end='')
           (with-output-to-string
             (with-current-buffer
                 standard-output
+              (hack-dir-local-variables-non-file-buffer)
               (setq exit-code
                     (call-pythonic :buffer standard-output :args (append (list "-c" code) args))))))
     (when (not (zerop exit-code))
@@ -876,6 +879,7 @@ user input.  HIST is a variable to store history of choices."
     (when (and process (process-live-p process))
       (setq buffer (generate-new-buffer "*Django*")))
     (with-current-buffer buffer
+      (hack-dir-local-variables-non-file-buffer)
       (start-pythonic :process "djangonaut"
                       :buffer buffer
                       :args (append (list "-m" "django") command)
