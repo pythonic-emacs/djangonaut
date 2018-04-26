@@ -48,15 +48,16 @@ print('\\n'.join(path))
 
 (defvar djangonaut-get-project-root-code "
 from __future__ import print_function
+
 import os, sys
+stdout = sys.stdout
+sys.stdout = open(os.devnull, 'w')
+sys.stderr = open(os.devnull, 'w')
 
 from importlib import import_module
 from os import environ
 from os.path import dirname
 
-stdout = sys.stdout
-sys.stdout = open(os.devnull, 'w')
-sys.stderr = open(os.devnull, 'w')
 settings_module = environ['DJANGO_SETTINGS_MODULE']
 package_name = settings_module.split('.', 1)[0]
 package = import_module(package_name)
@@ -67,8 +68,8 @@ print(project_root, end='', file=stdout)
 
 (defvar djangonaut-get-commands-code "
 from __future__ import print_function
-import os, sys
 
+import os, sys
 stdout = sys.stdout
 sys.stdout = open(os.devnull, 'w')
 sys.stderr = open(os.devnull, 'w')
@@ -88,8 +89,8 @@ print(dumps(commands), end='', file=stdout)
 
 (defvar djangonaut-get-command-definitions-code "
 from __future__ import print_function
-import os, sys
 
+import os, sys
 stdout = sys.stdout
 sys.stdout = open(os.devnull, 'w')
 sys.stderr = open(os.devnull, 'w')
@@ -115,8 +116,8 @@ print(dumps(commands), end='', file=stdout)
 
 (defvar djangonaut-get-command-arguments-code "
 from __future__ import print_function
-import os, sys
 
+import os, sys
 stdout = sys.stdout
 sys.stdout = open(os.devnull, 'w')
 sys.stderr = open(os.devnull, 'w')
@@ -215,8 +216,8 @@ print(dumps(paths), end='', file=stdout)
 
 (defvar djangonaut-get-admin-classes-code "
 from __future__ import print_function
-import os, sys
 
+import os, sys
 stdout = sys.stdout
 sys.stdout = open(os.devnull, 'w')
 sys.stderr = open(os.devnull, 'w')
@@ -249,8 +250,8 @@ print(dumps(admin_classes), end='', file=stdout)
 
 (defvar djangonaut-get-models-code "
 from __future__ import print_function
-import os, sys
 
+import os, sys
 stdout = sys.stdout
 sys.stdout = open(os.devnull, 'w')
 sys.stderr = open(os.devnull, 'w')
@@ -269,8 +270,8 @@ print(dumps(models), end='', file=stdout)
 
 (defvar djangonaut-get-model-managers-code "
 from __future__ import print_function
-import os, sys
 
+import os, sys
 stdout = sys.stdout
 sys.stdout = open(os.devnull, 'w')
 sys.stderr = open(os.devnull, 'w')
@@ -296,8 +297,8 @@ print(dumps(managers), end='', file=stdout)
 
 (defvar djangonaut-get-migrations-code "
 from __future__ import print_function
-import os, sys
 
+import os, sys
 stdout = sys.stdout
 sys.stdout = open(os.devnull, 'w')
 sys.stderr = open(os.devnull, 'w')
@@ -325,8 +326,8 @@ print(dumps(migrations), end='', file=stdout)
 
 (defvar djangonaut-get-sql-functions-code "
 from __future__ import print_function
-import os, sys
 
+import os, sys
 stdout = sys.stdout
 sys.stdout = open(os.devnull, 'w')
 sys.stderr = open(os.devnull, 'w')
@@ -352,8 +353,8 @@ print(dumps(functions), end='', file=stdout)
 
 (defvar djangonaut-get-signal-receivers-code "
 from __future__ import print_function
-import os, sys
 
+import os, sys
 stdout = sys.stdout
 sys.stdout = open(os.devnull, 'w')
 sys.stderr = open(os.devnull, 'w')
@@ -385,8 +386,8 @@ print(dumps(receivers), end='', file=stdout)
 
 (defvar djangonaut-get-drf-serializers-code "
 from __future__ import print_function
-import os, sys
 
+import os, sys
 stdout = sys.stdout
 sys.stdout = open(os.devnull, 'w')
 sys.stderr = open(os.devnull, 'w')
@@ -415,8 +416,8 @@ print(dumps(serializers), end='', file=stdout)
 
 (defvar djangonaut-get-drf-permissions-code "
 from __future__ import print_function
-import os, sys
 
+import os, sys
 stdout = sys.stdout
 sys.stdout = open(os.devnull, 'w')
 sys.stderr = open(os.devnull, 'w')
@@ -445,8 +446,8 @@ print(dumps(permissions), end='', file=stdout)
 
 (defvar djangonaut-get-views-code "
 from __future__ import print_function
-import os, sys
 
+import os, sys
 stdout = sys.stdout
 sys.stdout = open(os.devnull, 'w')
 sys.stderr = open(os.devnull, 'w')
@@ -516,8 +517,8 @@ print(dumps(views), end='', file=stdout)
 
 (defvar djangonaut-get-url-modules-code "
 from __future__ import print_function
-import os, sys
 
+import os, sys
 stdout = sys.stdout
 sys.stdout = open(os.devnull, 'w')
 sys.stderr = open(os.devnull, 'w')
@@ -563,8 +564,8 @@ print(dumps(url_modules), end='', file=stdout)
 
 (defvar djangonaut-get-templates-code "
 from __future__ import print_function
-import os, sys
 
+import os, sys
 stdout = sys.stdout
 sys.stdout = open(os.devnull, 'w')
 sys.stderr = open(os.devnull, 'w')
@@ -611,8 +612,8 @@ print(dumps(templates), end='', file=stdout)
 
 (defvar djangonaut-get-template-tags-code "
 from __future__ import print_function
-import os, sys
 
+import os, sys
 stdout = sys.stdout
 sys.stdout = open(os.devnull, 'w')
 sys.stderr = open(os.devnull, 'w')
@@ -671,8 +672,8 @@ print(dumps(template_tags), end='', file=stdout)
 
 (defvar djangonaut-get-template-filters-code "
 from __future__ import print_function
-import os, sys
 
+import os, sys
 stdout = sys.stdout
 sys.stdout = open(os.devnull, 'w')
 sys.stderr = open(os.devnull, 'w')
@@ -724,14 +725,14 @@ print(dumps(template_filters), end='', file=stdout)
 
 (defvar djangonaut-get-static-files-code "
 from __future__ import print_function
+
 import os, sys
-
-from django.apps import apps
-from django.conf import settings
-
 stdout = sys.stdout
 sys.stdout = open(os.devnull, 'w')
 sys.stderr = open(os.devnull, 'w')
+
+from django.apps import apps
+from django.conf import settings
 apps.populate(settings.INSTALLED_APPS)
 
 from json import dumps
@@ -750,8 +751,8 @@ print(dumps(staticfiles), end='', file=stdout)
 
 (defvar djangonaut-get-settings-path-code "
 from __future__ import print_function
-import os, sys
 
+import os, sys
 stdout = sys.stdout
 sys.stdout = open(os.devnull, 'w')
 sys.stderr = open(os.devnull, 'w')
