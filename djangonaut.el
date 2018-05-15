@@ -49,11 +49,6 @@ print('\\n'.join(path))
 (defvar djangonaut-get-project-root-code "
 from __future__ import print_function
 
-import os, sys
-stdout = sys.stdout
-sys.stdout = open(os.devnull, 'w')
-sys.stderr = open(os.devnull, 'w')
-
 from importlib import import_module
 from os import environ
 from os.path import dirname
@@ -63,21 +58,10 @@ package_name = settings_module.split('.', 1)[0]
 package = import_module(package_name)
 project_root = dirname(dirname(package.__file__))
 
-print(project_root, end='', file=stdout)
+print(project_root, end='')
 " "Python source code to get project root.")
 
 (defvar djangonaut-get-commands-code "
-from __future__ import print_function
-
-import os, sys
-stdout = sys.stdout
-sys.stdout = open(os.devnull, 'w')
-sys.stderr = open(os.devnull, 'w')
-
-from django.apps import apps
-from django.conf import settings
-apps.populate(settings.INSTALLED_APPS)
-
 from json import dumps
 
 from django.core.management import get_commands
@@ -88,17 +72,6 @@ print(dumps(commands), end='', file=stdout)
 " "Python source code to get commands.")
 
 (defvar djangonaut-get-command-definitions-code "
-from __future__ import print_function
-
-import os, sys
-stdout = sys.stdout
-sys.stdout = open(os.devnull, 'w')
-sys.stderr = open(os.devnull, 'w')
-
-from django.apps import apps
-from django.conf import settings
-apps.populate(settings.INSTALLED_APPS)
-
 from importlib import import_module
 from inspect import findsource, getsourcefile
 from json import dumps
@@ -115,17 +88,6 @@ print(dumps(commands), end='', file=stdout)
 " "Python source code to get command definitions.")
 
 (defvar djangonaut-get-command-arguments-code "
-from __future__ import print_function
-
-import os, sys
-stdout = sys.stdout
-sys.stdout = open(os.devnull, 'w')
-sys.stderr = open(os.devnull, 'w')
-
-from django.apps import apps
-from django.conf import settings
-apps.populate(settings.INSTALLED_APPS)
-
 from importlib import import_module
 from json import dumps
 from random import choice
@@ -196,17 +158,6 @@ print(dumps(arguments), end='', file=stdout)
 " "Python source code to get command arguments.")
 
 (defvar djangonaut-get-app-paths-code "
-from __future__ import print_function
-
-import os, sys
-stdout = sys.stdout
-sys.stdout = open(os.devnull, 'w')
-sys.stderr = open(os.devnull, 'w')
-
-from django.apps import apps
-from django.conf import settings
-apps.populate(settings.INSTALLED_APPS)
-
 from json import dumps
 
 paths = {app.label: app.path for app in apps.get_app_configs()}
@@ -215,17 +166,6 @@ print(dumps(paths), end='', file=stdout)
 " "Python source code to get app paths.")
 
 (defvar djangonaut-get-admin-classes-code "
-from __future__ import print_function
-
-import os, sys
-stdout = sys.stdout
-sys.stdout = open(os.devnull, 'w')
-sys.stderr = open(os.devnull, 'w')
-
-from django.apps import apps
-from django.conf import settings
-apps.populate(settings.INSTALLED_APPS)
-
 from inspect import findsource, getsourcefile
 from json import dumps
 
@@ -249,17 +189,6 @@ print(dumps(admin_classes), end='', file=stdout)
 " "Python source code to get admin classes.")
 
 (defvar djangonaut-get-models-code "
-from __future__ import print_function
-
-import os, sys
-stdout = sys.stdout
-sys.stdout = open(os.devnull, 'w')
-sys.stderr = open(os.devnull, 'w')
-
-from django.apps import apps
-from django.conf import settings
-apps.populate(settings.INSTALLED_APPS)
-
 from inspect import findsource, getsourcefile
 from json import dumps
 
@@ -269,17 +198,6 @@ print(dumps(models), end='', file=stdout)
 " "Python source code to get models.")
 
 (defvar djangonaut-get-model-managers-code "
-from __future__ import print_function
-
-import os, sys
-stdout = sys.stdout
-sys.stdout = open(os.devnull, 'w')
-sys.stderr = open(os.devnull, 'w')
-
-from django.apps import apps
-from django.conf import settings
-apps.populate(settings.INSTALLED_APPS)
-
 from gc import get_objects
 from inspect import findsource, getsourcefile, getmodule, isclass
 from json import dumps
@@ -296,17 +214,6 @@ print(dumps(managers), end='', file=stdout)
 " "Python source code to get model managers.")
 
 (defvar djangonaut-get-migrations-code "
-from __future__ import print_function
-
-import os, sys
-stdout = sys.stdout
-sys.stdout = open(os.devnull, 'w')
-sys.stderr = open(os.devnull, 'w')
-
-from django.apps import apps
-from django.conf import settings
-apps.populate(settings.INSTALLED_APPS)
-
 from inspect import findsource, getsourcefile
 from json import dumps
 
@@ -325,17 +232,6 @@ print(dumps(migrations), end='', file=stdout)
 " "Python source code to get migrations.")
 
 (defvar djangonaut-get-sql-functions-code "
-from __future__ import print_function
-
-import os, sys
-stdout = sys.stdout
-sys.stdout = open(os.devnull, 'w')
-sys.stderr = open(os.devnull, 'w')
-
-from django.apps import apps
-from django.conf import settings
-apps.populate(settings.INSTALLED_APPS)
-
 from gc import get_objects
 from inspect import findsource, getsourcefile, getmodule, isclass
 from json import dumps
@@ -352,17 +248,6 @@ print(dumps(functions), end='', file=stdout)
 " "Python source code to get sql functions.")
 
 (defvar djangonaut-get-signal-receivers-code "
-from __future__ import print_function
-
-import os, sys
-stdout = sys.stdout
-sys.stdout = open(os.devnull, 'w')
-sys.stderr = open(os.devnull, 'w')
-
-from django.apps import apps
-from django.conf import settings
-apps.populate(settings.INSTALLED_APPS)
-
 from gc import get_objects
 from inspect import findsource, getsourcefile, getmodule
 from json import dumps
@@ -385,17 +270,6 @@ print(dumps(receivers), end='', file=stdout)
 " "Python source code to get signal receivers.")
 
 (defvar djangonaut-get-drf-serializers-code "
-from __future__ import print_function
-
-import os, sys
-stdout = sys.stdout
-sys.stdout = open(os.devnull, 'w')
-sys.stderr = open(os.devnull, 'w')
-
-from django.apps import apps
-from django.conf import settings
-apps.populate(settings.INSTALLED_APPS)
-
 from gc import get_objects
 from importlib import import_module
 from inspect import findsource, getsourcefile, getmodule, isclass
@@ -415,17 +289,6 @@ print(dumps(serializers), end='', file=stdout)
 " "Python source code to get drf serializers.")
 
 (defvar djangonaut-get-drf-permissions-code "
-from __future__ import print_function
-
-import os, sys
-stdout = sys.stdout
-sys.stdout = open(os.devnull, 'w')
-sys.stderr = open(os.devnull, 'w')
-
-from django.apps import apps
-from django.conf import settings
-apps.populate(settings.INSTALLED_APPS)
-
 from gc import get_objects
 from importlib import import_module
 from inspect import findsource, getsourcefile, getmodule, isclass
@@ -445,17 +308,6 @@ print(dumps(permissions), end='', file=stdout)
 " "Python source code to get drf permissions.")
 
 (defvar djangonaut-get-views-code "
-from __future__ import print_function
-
-import os, sys
-stdout = sys.stdout
-sys.stdout = open(os.devnull, 'w')
-sys.stderr = open(os.devnull, 'w')
-
-from django.apps import apps
-from django.conf import settings
-apps.populate(settings.INSTALLED_APPS)
-
 from inspect import findsource, getsourcefile, getmodule, ismethod
 from json import dumps
 
@@ -516,17 +368,6 @@ print(dumps(views), end='', file=stdout)
 " "Python source code to get views.")
 
 (defvar djangonaut-get-url-modules-code "
-from __future__ import print_function
-
-import os, sys
-stdout = sys.stdout
-sys.stdout = open(os.devnull, 'w')
-sys.stderr = open(os.devnull, 'w')
-
-from django.apps import apps
-from django.conf import settings
-apps.populate(settings.INSTALLED_APPS)
-
 from json import dumps
 from types import ModuleType
 
@@ -563,17 +404,6 @@ print(dumps(url_modules), end='', file=stdout)
 " "Python source code to get url modules.")
 
 (defvar djangonaut-get-templates-code "
-from __future__ import print_function
-
-import os, sys
-stdout = sys.stdout
-sys.stdout = open(os.devnull, 'w')
-sys.stderr = open(os.devnull, 'w')
-
-from django.apps import apps
-from django.conf import settings
-apps.populate(settings.INSTALLED_APPS)
-
 from json import dumps
 from os import walk
 from os.path import join
@@ -611,17 +441,6 @@ print(dumps(templates), end='', file=stdout)
 " "Python source code to get templates.")
 
 (defvar djangonaut-get-template-tags-code "
-from __future__ import print_function
-
-import os, sys
-stdout = sys.stdout
-sys.stdout = open(os.devnull, 'w')
-sys.stderr = open(os.devnull, 'w')
-
-from django.apps import apps
-from django.conf import settings
-apps.populate(settings.INSTALLED_APPS)
-
 from importlib import import_module
 from inspect import findsource, getsourcefile
 from json import dumps
@@ -671,17 +490,6 @@ print(dumps(template_tags), end='', file=stdout)
 " "Python source code to get template tags.")
 
 (defvar djangonaut-get-template-filters-code "
-from __future__ import print_function
-
-import os, sys
-stdout = sys.stdout
-sys.stdout = open(os.devnull, 'w')
-sys.stderr = open(os.devnull, 'w')
-
-from django.apps import apps
-from django.conf import settings
-apps.populate(settings.INSTALLED_APPS)
-
 from importlib import import_module
 from inspect import findsource, getsourcefile
 from json import dumps
@@ -724,17 +532,6 @@ print(dumps(template_filters), end='', file=stdout)
 " "Python source code to get template filters.")
 
 (defvar djangonaut-get-static-files-code "
-from __future__ import print_function
-
-import os, sys
-stdout = sys.stdout
-sys.stdout = open(os.devnull, 'w')
-sys.stderr = open(os.devnull, 'w')
-
-from django.apps import apps
-from django.conf import settings
-apps.populate(settings.INSTALLED_APPS)
-
 from json import dumps
 
 from django.contrib.staticfiles.finders import get_finders
@@ -750,13 +547,6 @@ print(dumps(staticfiles), end='', file=stdout)
 " "Python source code to get static files.")
 
 (defvar djangonaut-get-settings-path-code "
-from __future__ import print_function
-
-import os, sys
-stdout = sys.stdout
-sys.stdout = open(os.devnull, 'w')
-sys.stderr = open(os.devnull, 'w')
-
 from importlib import import_module
 from inspect import getsourcefile
 from os import environ
@@ -767,6 +557,25 @@ settings_path = getsourcefile(module)
 
 print(settings_path, end='', file=stdout)
 " "Python source code to get settings path.")
+
+(defvar djangonaut-wrapper-template "
+from __future__ import print_function
+
+import os, sys, traceback
+stdout = sys.stdout
+sys.stdout = open(os.devnull, 'w')
+sys.stderr = open(os.devnull, 'w')
+
+try:
+    from django.apps import apps
+    from django.conf import settings
+    apps.populate(settings.INSTALLED_APPS)
+
+    %s
+except:
+    traceback.print_exc(None, stdout)
+    raise
+" "Try/except python wrapper to handle output redirection.")
 
 (defvar djangonaut-app-paths-history nil)
 
@@ -820,6 +629,11 @@ print(settings_path, end='', file=stdout)
       (call-pythonic :buffer standard-output
                      :args (list "-c" djangonaut-get-project-root-code)))))
 
+(defun djangonaut-wrap (code)
+  "Wrap code with try/except code block."
+  (format djangonaut-wrapper-template
+          (s-join "\n    " (s-split "\n" code))))
+
 (defun djangonaut-call (code &rest args)
   "Execute python CODE with ARGS.  Show errors if occurs."
   (let (exit-code output)
@@ -829,7 +643,8 @@ print(settings_path, end='', file=stdout)
                 standard-output
               (hack-dir-local-variables-non-file-buffer)
               (setq exit-code
-                    (call-pythonic :buffer standard-output :args (append (list "-c" code) args))))))
+                    (call-pythonic :buffer standard-output
+                                   :args (append (list "-c" (djangonaut-wrap code)) args))))))
     (when (not (zerop exit-code))
       (djangonaut-show-error output (format "Python exit with status code %d" exit-code)))
     output))
