@@ -367,6 +367,21 @@ collect_views(get_resolver(get_urlconf()))
 print(dumps(views), end='', file=stdout)
 " "Python source code to get views.")
 
+(defvar djangonaut-get-middlewares-code "
+from inspect import findsource, getsourcefile
+from json import dumps
+
+from django.utils.module_loading import import_string
+
+middlewares = {}
+
+for name in getattr(settings, 'MIDDLEWARE', None) or settings.MIDDLEWARE_CLASSES:
+    middleware = import_string(name)
+    middlewares[name] = [getsourcefile(middleware), findsource(middleware)[1]]
+
+print(dumps(middlewares), end='', file=stdout)
+" "Python source code to get middlewares.")
+
 (defvar djangonaut-get-url-modules-code "
 from json import dumps
 from types import ModuleType
@@ -599,6 +614,8 @@ except:
 
 (defvar djangonaut-views-history nil)
 
+(defvar djangonaut-middlewares-history nil)
+
 (defvar djangonaut-url-modules-history nil)
 
 (defvar djangonaut-templates-history nil)
@@ -753,6 +770,10 @@ user input.  HIST is a variable to store history of choices."
 (defun djangonaut-get-views ()
   "Execute and parse python code to get views."
   (djangonaut-read (djangonaut-call djangonaut-get-views-code)))
+
+(defun djangonaut-get-middlewares ()
+  "Execute and parse python code to get middlewares."
+  (djangonaut-read (djangonaut-call djangonaut-get-middlewares-code)))
 
 (defun djangonaut-get-url-modules ()
   "Execute and parse python code to get url modules."
@@ -934,6 +955,16 @@ user input.  HIST is a variable to store history of choices."
   (interactive)
   (djangonaut-find-file-and-line #'find-file-other-window "View: " (djangonaut-get-views) 'djangonaut-views-history))
 
+(defun djangonaut-find-middleware ()
+  "Open definition of the Django middleware."
+  (interactive)
+  (djangonaut-find-file-and-line #'find-file "Middleware: " (djangonaut-get-middlewares) 'djangonaut-middlewares-history))
+
+(defun djangonaut-find-middleware-other-window ()
+  "Open definition of the Django middleware in the other window."
+  (interactive)
+  (djangonaut-find-file-and-line #'find-file-other-window "Middleware: " (djangonaut-get-middlewares) 'djangonaut-middlewares-history))
+
 (defun djangonaut-find-url-module ()
   "Open definition of the Django url module."
   (interactive)
@@ -1014,6 +1045,7 @@ user input.  HIST is a variable to store history of choices."
     (define-key map (kbd "s") 'djangonaut-find-drf-serializer)
     (define-key map (kbd "p") 'djangonaut-find-drf-permission)
     (define-key map (kbd "v") 'djangonaut-find-view)
+    (define-key map (kbd "w") 'djangonaut-find-middleware)
     (define-key map (kbd "u") 'djangonaut-find-url-module)
     (define-key map (kbd "t") 'djangonaut-find-template)
     (define-key map (kbd "g") 'djangonaut-find-template-tag)
@@ -1031,6 +1063,7 @@ user input.  HIST is a variable to store history of choices."
     (define-key map (kbd "4 s") 'djangonaut-find-drf-serializer-other-window)
     (define-key map (kbd "4 p") 'djangonaut-find-drf-permission-other-window)
     (define-key map (kbd "4 v") 'djangonaut-find-view-other-window)
+    (define-key map (kbd "4 w") 'djangonaut-find-middleware-other-window)
     (define-key map (kbd "4 u") 'djangonaut-find-url-module-other-window)
     (define-key map (kbd "4 t") 'djangonaut-find-template-other-window)
     (define-key map (kbd "4 g") 'djangonaut-find-template-tag-other-window)

@@ -22,6 +22,7 @@
                 (djangonaut-get-drf-serializers)
                 (djangonaut-get-drf-permissions)
                 (djangonaut-get-views)
+                (djangonaut-get-middlewares)
                 (djangonaut-get-url-modules)
                 (djangonaut-get-templates)
                 (djangonaut-get-template-tags)
