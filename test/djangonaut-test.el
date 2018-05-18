@@ -35,8 +35,9 @@
         (condition-case err
             (should-not (null (,@args)))
           (error
-           (with-current-buffer "*Django*"
-             (message (buffer-substring-no-properties (point-min) (point-max))))
+           (when (get-buffer "*Django*")
+             (with-current-buffer "*Django*"
+               (message (buffer-substring-no-properties (point-min) (point-max)))))
            (signal (car err) (cdr err))))))))
 
 ;;; djangonaut-test.el ends here
