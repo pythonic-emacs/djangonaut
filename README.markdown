@@ -66,22 +66,29 @@ tell Emacs where it can find an interpreter:
 
     M-x pythonic-activate RET /path/to/your/venv/ RET
 
-If you use Docker or Docker Compose for development, setup path to the
-interpreter directly.  Also you need to install
+If you use Docker or Docker Compose for development, open any of the
+project files using tramp.  Optionally you can specify interpreter
+location inside container.  Also you need to install
 [docker-tramp](https://github.com/emacs-pe/docker-tramp.el) package to
 use remote interpreter this way.
 
-    M-x set-variable RET python-shell-interpreter RET "/docker:root@container:/usr/local/bin/python"
+    C-x C-f /docker:root@container:/app/config/urls.py
+    ;; Optionally...
+    M-x set-variable RET python-shell-interpreter RET "/usr/local/bin/python"
 
 If you use Vagrant for development, first of all add your ssh key to
 the trusted list in your VM, so you will not be annoyed with password
-prompt pops up frequently.
+prompt pops up frequently.  Then open any project file in the running
+virtual machine.
 
+    ;; SSH config (done once).
     ssh-copy-id vagrant@localhost -p 2222
+    ;; Open project file (each time at the begging).
+    C-x C-f /ssh:vagrant@localhost#2222:/app/config/urls.py
 
-Now you can point Emacs to the remote interpreter this way
+Optionally point Emacs to the remote interpreter this way
 
-    M-x set-variable RET python-shell-interpreter RET "/ssh:vagrant@localhost#2222:/usr/bin/python" RET
+    M-x set-variable RET python-shell-interpreter RET "/usr/bin/python" RET
 
 #### Path to the project
 
