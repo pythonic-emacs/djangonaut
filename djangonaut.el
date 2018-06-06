@@ -633,8 +633,8 @@ except:
      (with-current-buffer
          standard-output
        (hack-dir-local-variables-non-file-buffer)
-       (call-pythonic :buffer standard-output
-                      :args (list "-c" djangonaut-get-pythonpath-code))))
+       (pythonic-call-process :buffer standard-output
+                              :args (list "-c" djangonaut-get-pythonpath-code))))
    nil t))
 
 (defun djangonaut-get-project-root ()
@@ -643,8 +643,8 @@ except:
     (with-current-buffer
         standard-output
       (hack-dir-local-variables-non-file-buffer)
-      (call-pythonic :buffer standard-output
-                     :args (list "-c" djangonaut-get-project-root-code)))))
+      (pythonic-call-process :buffer standard-output
+                             :args (list "-c" djangonaut-get-project-root-code)))))
 
 (defun djangonaut-wrap (code)
   "Wrap code with try/except code block."
@@ -660,8 +660,8 @@ except:
                 standard-output
               (hack-dir-local-variables-non-file-buffer)
               (setq exit-code
-                    (call-pythonic :buffer standard-output
-                                   :args (append (list "-c" (djangonaut-wrap code)) args))))))
+                    (pythonic-call-process :buffer standard-output
+                                           :args (append (list "-c" (djangonaut-wrap code)) args))))))
     (when (not (zerop exit-code))
       (djangonaut-show-error output (format "Python exit with status code %d" exit-code)))
     output))
@@ -699,9 +699,7 @@ FUNC is function to open file.  PROMPT and COLLECTION stands for
 user input.  HIST is a variable to store history of choices."
   (let* ((key (intern (completing-read prompt (mapcar 'symbol-name (mapcar 'car collection)) nil t nil hist)))
          (value (cdr (assoc key collection))))
-    (when (pythonic-remote-p)
-      (setq value (concat (pythonic-tramp-connection) value)))
-    (apply func value nil)))
+    (apply func (pythonic-real-file-name value) nil)))
 
 (defun djangonaut-find-file-and-line (func prompt collection hist)
   "Ask user to select some name and open its definition at the line number.
@@ -712,9 +710,7 @@ user input.  HIST is a variable to store history of choices."
          (code (cdr (assoc key collection)))
          (value (elt code 0))
          (lineno (elt code 1)))
-    (when (pythonic-remote-p)
-      (setq value (concat (pythonic-tramp-connection) value)))
-    (apply func value nil)
+    (apply func (pythonic-real-file-name value) nil)
     (goto-char (point-min))
     (forward-line lineno)))
 
@@ -816,12 +812,12 @@ user input.  HIST is a variable to store history of choices."
       (setq buffer (generate-new-buffer "*Django*")))
     (with-current-buffer buffer
       (hack-dir-local-variables-non-file-buffer)
-      (start-pythonic :process "djangonaut"
-                      :buffer buffer
-                      :args (append (list "-m" "django") command)
-                      :cwd (djangonaut-get-project-root)
-                      :filter (lambda (process string)
-                                (comint-output-filter process (ansi-color-apply string))))
+      (pythonic-start-process :process "djangonaut"
+                              :buffer buffer
+                              :args (append (list "-m" "django") command)
+                              :cwd (djangonaut-get-project-root)
+                              :filter (lambda (process string)
+                                        (comint-output-filter process (ansi-color-apply string))))
       (let ((inhibit-read-only t))
         (erase-buffer))
       (comint-mode)
@@ -1019,17 +1015,13 @@ user input.  HIST is a variable to store history of choices."
   "Open definition of the Django settings module."
   (interactive)
   (let ((filename (djangonaut-get-settings-path)))
-    (when (pythonic-remote-p)
-      (setq filename (concat (pythonic-tramp-connection) filename)))
-    (find-file filename)))
+    (find-file (pythonic-real-file-name filename))))
 
 (defun djangonaut-find-settings-module-other-window ()
   "Open definition of the Django settings module in the other window."
   (interactive)
   (let ((filename (djangonaut-get-settings-path)))
-    (when (pythonic-remote-p)
-      (setq filename (concat (pythonic-tramp-connection) filename)))
-    (find-file-other-window filename)))
+    (find-file-other-window (pythonic-real-file-name filename))))
 
 (defvar djangonaut-command-map
   (let ((map (make-sparse-keymap)))
@@ -1092,7 +1084,7 @@ user input.  HIST is a variable to store history of choices."
   (lambda ()
     (ignore-errors
       (when (djangonaut-get-project-root)
-        (let ((directory (pythonic-file-name default-directory)))
+        (let ((directory (pythonic-local-file-name default-directory)))
           (dolist (path (djangonaut-get-pythonpath))
             (when (or (f-same? path directory)
                       (f-ancestor-of? path directory))
