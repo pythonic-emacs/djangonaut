@@ -712,7 +712,7 @@ FUNC is function to open file.  PROMPT and COLLECTION stands for
 user input.  HIST is a variable to store history of choices."
   (let* ((key (intern (completing-read prompt (mapcar 'symbol-name (mapcar 'car collection)) nil t nil hist)))
          (value (cdr (assoc key collection))))
-    (apply func (pythonic-real-file-name value) nil)))
+    (apply func (pythonic-emacs-readable-file-name value) nil)))
 
 (defun djangonaut-find-file-and-line (func prompt collection hist)
   "Ask user to select some name and open its definition at the line number.
@@ -723,7 +723,7 @@ user input.  HIST is a variable to store history of choices."
          (code (cdr (assoc key collection)))
          (value (elt code 0))
          (lineno (elt code 1)))
-    (apply func (pythonic-real-file-name value) nil)
+    (apply func (pythonic-emacs-readable-file-name value) nil)
     (goto-char (point-min))
     (forward-line lineno)
     (run-hooks 'djangonaut-navigate-line-hook)))
@@ -1029,13 +1029,13 @@ user input.  HIST is a variable to store history of choices."
   "Open definition of the Django settings module."
   (interactive)
   (let ((filename (djangonaut-get-settings-path)))
-    (find-file (pythonic-real-file-name filename))))
+    (find-file (pythonic-emacs-readable-file-name filename))))
 
 (defun djangonaut-find-settings-module-other-window ()
   "Open definition of the Django settings module in the other window."
   (interactive)
   (let ((filename (djangonaut-get-settings-path)))
-    (find-file-other-window (pythonic-real-file-name filename))))
+    (find-file-other-window (pythonic-emacs-readable-file-name filename))))
 
 (defvar djangonaut-command-map
   (let ((map (make-sparse-keymap)))
@@ -1098,7 +1098,7 @@ user input.  HIST is a variable to store history of choices."
   (lambda ()
     (ignore-errors
       (when (djangonaut-get-project-root)
-        (let ((directory (pythonic-local-file-name default-directory)))
+        (let ((directory (pythonic-python-readable-file-name default-directory)))
           (dolist (path (djangonaut-get-pythonpath))
             (when (or (f-same? path directory)
                       (f-ancestor-of? path directory))
