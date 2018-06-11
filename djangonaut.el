@@ -47,8 +47,8 @@
 (defcustom djangonaut-navigate-line-hook '(recenter)
   "Hooks called after jumping to a place in the buffer.
 
-Useful things to use here include `reposition-window', `recenter', and
-\(lambda () (recenter 0)) to show at top of screen."
+Useful things to use here include `reposition-window',
+`recenter', and `recenter-top-bottom' functions."
   :type 'hook)
 
 (defvar djangonaut-get-pythonpath-code "
