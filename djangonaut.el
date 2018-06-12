@@ -28,6 +28,7 @@
 
 (require 'magit-popup)
 (require 'ansi-color)
+(require 'easymenu)
 (require 'pythonic)
 (require 'compile)
 (require 'comint)
@@ -1082,6 +1083,50 @@ user input.  HIST is a variable to store history of choices."
   (let ((map (make-sparse-keymap)))
     (define-key map djangonaut-keymap-prefix djangonaut-command-map)
     map))
+
+(easy-menu-define djangonout-mode-menu djangonaut-mode-map
+  "Menu to interact with Django project."
+  '("Django"
+    ["Run management command" djangonaut-run-management-command
+     :help "Run management command in the comint buffer"]
+    ["Run management command popup" djangonaut-run-popup-management-command
+     :help "Run management command with arguments specified in the popup buffer"]
+    ["Dired application dir " djangonaut-dired-installed-apps
+     :help "Open application directory in the dired buffer"]
+    ["Find management command" djangonaut-find-management-command
+     :help "Open definition of the Django management command"]
+    ["Find admin class" djangonaut-find-admin-class
+     :help "Open definition of the Django admin class"]
+    ["Find model" djangonaut-find-model
+     :help "Open definition of the Django model"]
+    ["Find model manager" djangonaut-find-model-manager
+     :help "Open definition of the Django model manager"]
+    ["Find migration" djangonaut-find-migration
+     :help "Open definition of the Django migration"]
+    ["Find sql function" djangonaut-find-sql-function
+     :help "Open definition of the Django sql function"]
+    ["Find signal receiver" djangonaut-find-signal-receiver
+     :help "Open definition of the Django signal receiver"]
+    ["Find drf serializer" djangonaut-find-drf-serializer
+     :help "Open definition of the Django drf serializer"]
+    ["Find drf permission" djangonaut-find-drf-permission
+     :help "Open definition of the Django drf permission"]
+    ["Find view" djangonaut-find-view
+     :help "Open definition of the Django view"]
+    ["Find middleware" djangonaut-find-middleware
+     :help "Open definition of the Django middleware"]
+    ["Find url module" djangonaut-find-url-module
+     :help "Open definition of the Django url module"]
+    ["Find template" djangonaut-find-template
+     :help "Open definition of the Django template"]
+    ["Find template tag" djangonaut-find-template-tag
+     :help "Open definition of the Django template tag"]
+    ["Find template filter" djangonaut-find-template-filter
+     :help "Open definition of the Django template filter"]
+    ["Find static file" djangonaut-find-static-file
+     :help "Open definition of the Django static file"]
+    ["Find settings module" djangonaut-find-settings-module
+     :help "Open definition of the Django settings module"]))
 
 (defvar djangonaut-mode-lighter " Django")
 
