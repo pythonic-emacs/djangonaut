@@ -829,7 +829,7 @@ user input.  HIST is a variable to store history of choices."
       (pythonic-start-process :process "djangonaut"
                               :buffer buffer
                               :args (append (list "-m" "django") command)
-                              :cwd (djangonaut-get-project-root)
+                              :cwd (pythonic-emacs-readable-file-name (djangonaut-get-project-root))
                               :filter (lambda (process string)
                                         (comint-output-filter process (ansi-color-apply string))))
       (let ((inhibit-read-only t))
