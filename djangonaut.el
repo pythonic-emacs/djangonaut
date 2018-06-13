@@ -76,41 +76,34 @@ print(project_root, end='')
 " "Python source code to get project root.")
 
 (defvar djangonaut-get-commands-code "
-from json import dumps
-
 from django.core.management import get_commands
 
-commands = list(get_commands().keys())
+for command in get_commands():
+    result[command] = ''
 
-print(dumps(commands), end='', file=stdout)
 " "Python source code to get commands.")
 
 (defvar djangonaut-get-command-definitions-code "
 from importlib import import_module
 from inspect import findsource, getsourcefile
-from json import dumps
 
 from django.core.management import get_commands
 
-commands = {}
 for command_name, module_name in get_commands().items():
     module = import_module(module_name + '.management.commands.' + command_name)
     command = module.Command
-    commands[command_name] = [getsourcefile(command), findsource(command)[1]]
+    result[command_name] = [getsourcefile(command), findsource(command)[1]]
 
-print(dumps(commands), end='', file=stdout)
 " "Python source code to get command definitions.")
 
 (defvar djangonaut-get-command-arguments-code "
 from importlib import import_module
-from json import dumps
 from random import choice
 from string import ascii_letters
 from sys import argv
 
 from django.core.management import get_commands
 
-arguments = {}
 known_shortcuts = set([])
 
 def get_free_shortcut(short):
@@ -128,10 +121,10 @@ class Parser(object):
         assert 0 < len(args) < 3, 'Unsupported arguments: {0} {1}'.format(args, kwargs)
 
         if kwargs.get('action') in ('store_true', 'store_false'):
-            target = arguments.setdefault('switches', [])
+            target = result.setdefault('switches', [])
             get_option = lambda x, end: x
         else:
-            target = arguments.setdefault('options', [])
+            target = result.setdefault('options', [])
             get_option = lambda x, end: x + end
 
         data = {'optional': None, 'short': None, 'positional': None}
@@ -168,20 +161,16 @@ module = import_module(module_name + '.management.commands.' + command_name)
 command = module.Command()
 command.add_arguments(Parser)
 
-print(dumps(arguments), end='', file=stdout)
 " "Python source code to get command arguments.")
 
 (defvar djangonaut-get-app-paths-code "
-from json import dumps
+for app in apps.get_app_configs():
+    result[app.label] = app.path
 
-paths = {app.label: app.path for app in apps.get_app_configs()}
-
-print(dumps(paths), end='', file=stdout)
 " "Python source code to get app paths.")
 
 (defvar djangonaut-get-admin-classes-code "
 from inspect import findsource, getsourcefile
-from json import dumps
 
 try:
     from django.contrib.admin.sites import all_sites
@@ -193,83 +182,69 @@ except ImportError:
         if isinstance(obj, AdminSite):
             all_sites.append(obj)
 
-admin_classes = {}
 for site in all_sites:
     for admin_instance in site._registry.values():
         admin_class = admin_instance.__class__
-        admin_classes[str(admin_instance)] = [getsourcefile(admin_class), findsource(admin_class)[1]]
+        result[str(admin_instance)] = [getsourcefile(admin_class), findsource(admin_class)[1]]
 
-print(dumps(admin_classes), end='', file=stdout)
 " "Python source code to get admin classes.")
 
 (defvar djangonaut-get-models-code "
 from inspect import findsource, getsourcefile
-from json import dumps
 
-models = {model._meta.app_label + '.' + model.__name__: [getsourcefile(model), findsource(model)[1]] for model in apps.get_models()}
+for model in apps.get_models():
+    result[model._meta.app_label + '.' + model.__name__] = [getsourcefile(model), findsource(model)[1]]
 
-print(dumps(models), end='', file=stdout)
 " "Python source code to get models.")
 
 (defvar djangonaut-get-model-managers-code "
 from gc import get_objects
 from inspect import findsource, getsourcefile, getmodule, isclass
-from json import dumps
 
 from django.db.models import Manager
 
-managers = {}
 for obj in get_objects():
     if isclass(obj) and issubclass(obj, Manager):
         name = getmodule(obj).__name__ + '.' + obj.__name__
-        managers[name] = [getsourcefile(obj), findsource(obj)[1]]
+        result[name] = [getsourcefile(obj), findsource(obj)[1]]
 
-print(dumps(managers), end='', file=stdout)
 " "Python source code to get model managers.")
 
 (defvar djangonaut-get-migrations-code "
 from inspect import findsource, getsourcefile
-from json import dumps
 
 from django.db.migrations.loader import MigrationLoader
 
 loader = MigrationLoader(connection=None, load=False)
 loader.load_disk()
 
-migrations = {}
 for (label, module_name), migration in sorted(loader.disk_migrations.items()):
     name = label + '.' + module_name
     Migration = migration.__class__
-    migrations[name] = [getsourcefile(Migration), findsource(Migration)[1]]
+    result[name] = [getsourcefile(Migration), findsource(Migration)[1]]
 
-print(dumps(migrations), end='', file=stdout)
 " "Python source code to get migrations.")
 
 (defvar djangonaut-get-sql-functions-code "
 from gc import get_objects
 from inspect import findsource, getsourcefile, getmodule, isclass
-from json import dumps
 
 from django.db.models import Func
 
-functions = {}
 for obj in get_objects():
     if isclass(obj) and issubclass(obj, Func):
         name = getmodule(obj).__name__ + '.' + obj.__name__
-        functions[name] = [getsourcefile(obj), findsource(obj)[1]]
+        result[name] = [getsourcefile(obj), findsource(obj)[1]]
 
-print(dumps(functions), end='', file=stdout)
 " "Python source code to get sql functions.")
 
 (defvar djangonaut-get-signal-receivers-code "
 from gc import get_objects
 from inspect import findsource, getsourcefile, getmodule
-from json import dumps
 from weakref import ReferenceType
 
 from django.dispatch.dispatcher import Signal
 
-receivers = {}
 for obj in get_objects():
     if isinstance(obj, Signal):
         for lookup_key, receiver in obj.receivers:
@@ -278,52 +253,44 @@ for obj in get_objects():
                 if receiver is None:
                     continue
             name = getmodule(receiver).__name__ + '.' + receiver.__name__
-            receivers[name] = [getsourcefile(receiver), findsource(receiver)[1]]
+            result[name] = [getsourcefile(receiver), findsource(receiver)[1]]
 
-print(dumps(receivers), end='', file=stdout)
 " "Python source code to get signal receivers.")
 
 (defvar djangonaut-get-drf-serializers-code "
 from gc import get_objects
 from importlib import import_module
 from inspect import findsource, getsourcefile, getmodule, isclass
-from json import dumps
 
 from rest_framework.serializers import Serializer
 
 import_module(settings.ROOT_URLCONF)
 
-serializers = {}
 for obj in get_objects():
     if isclass(obj) and issubclass(obj, Serializer):
         name = getmodule(obj).__name__ + '.' + obj.__name__
-        serializers[name] = [getsourcefile(obj), findsource(obj)[1]]
+        result[name] = [getsourcefile(obj), findsource(obj)[1]]
 
-print(dumps(serializers), end='', file=stdout)
 " "Python source code to get drf serializers.")
 
 (defvar djangonaut-get-drf-permissions-code "
 from gc import get_objects
 from importlib import import_module
 from inspect import findsource, getsourcefile, getmodule, isclass
-from json import dumps
 
 from rest_framework.permissions import BasePermission
 
 import_module(settings.ROOT_URLCONF)
 
-permissions = {}
 for obj in get_objects():
     if isclass(obj) and issubclass(obj, BasePermission):
         name = getmodule(obj).__name__ + '.' + obj.__name__
-        permissions[name] = [getsourcefile(obj), findsource(obj)[1]]
+        result[name] = [getsourcefile(obj), findsource(obj)[1]]
 
-print(dumps(permissions), end='', file=stdout)
 " "Python source code to get drf permissions.")
 
 (defvar djangonaut-get-views-code "
 from inspect import findsource, getsourcefile, getmodule, ismethod
-from json import dumps
 
 try:
     from django.urls import get_resolver, get_urlconf
@@ -352,8 +319,6 @@ except ImportError:
             func = func.__wrapped__
         return func
 
-views = {}
-
 def collect_views(resolver):
     for pattern in resolver.url_patterns:
         if isinstance(pattern, resolver_classes):
@@ -374,30 +339,24 @@ def collect_views(resolver):
                     name = getmodule(view).__name__ + '.' + view.__self__.__class__.__name__ + '.' + view.__name__
                 else:
                     name = getmodule(view).__name__ + '.' + view.__name__
-            views[name] = [getsourcefile(view), findsource(view)[1]]
+            result[name] = [getsourcefile(view), findsource(view)[1]]
 
 collect_views(get_resolver(get_urlconf()))
 
-print(dumps(views), end='', file=stdout)
 " "Python source code to get views.")
 
 (defvar djangonaut-get-middlewares-code "
 from inspect import findsource, getsourcefile
-from json import dumps
 
 from django.utils.module_loading import import_string
 
-middlewares = {}
-
 for name in getattr(settings, 'MIDDLEWARE', None) or settings.MIDDLEWARE_CLASSES:
     middleware = import_string(name)
-    middlewares[name] = [getsourcefile(middleware), findsource(middleware)[1]]
+    result[name] = [getsourcefile(middleware), findsource(middleware)[1]]
 
-print(dumps(middlewares), end='', file=stdout)
 " "Python source code to get middlewares.")
 
 (defvar djangonaut-get-url-modules-code "
-from json import dumps
 from types import ModuleType
 
 try:
@@ -416,24 +375,20 @@ except ImportError:
         from django.core.urlresolvers import RegexURLResolver
         resolver_classes = (RegexURLResolver,)
 
-url_modules = {}
-
 def collect_url_modules(conf):
     name = conf.urlconf_name
     if isinstance(name, ModuleType):
         name = name.__name__
-    url_modules[name] = conf.urlconf_module.__file__
+    result[name] = conf.urlconf_module.__file__
     for pattern in conf.url_patterns:
         if isinstance(pattern, resolver_classes) and not isinstance(pattern.urlconf_module, list):
             collect_url_modules(pattern)
 
 collect_url_modules(get_resolver(get_urlconf()))
 
-print(dumps(url_modules), end='', file=stdout)
 " "Python source code to get url modules.")
 
 (defvar djangonaut-get-templates-code "
-from json import dumps
 from os import walk
 from os.path import join
 
@@ -445,8 +400,6 @@ from django.template.loaders.app_directories import Loader as AppDirectoriesLoad
 from django.template.utils import get_app_template_dirs
 
 ignore_patterns = ['CVS', '.*', '*~']
-
-templates = {}
 
 for engine in engines.all():
     if isinstance(engine, DjangoTemplates):
@@ -464,15 +417,13 @@ for engine in engines.all():
                         for template in files:
                             template_path = join(root, template)
                             if not matches_patterns(template_path, ignore_patterns):
-                                templates.setdefault(template_path[len(template_directory) + 1:], template_path)
+                                result.setdefault(template_path[len(template_directory) + 1:], template_path)
 
-print(dumps(templates), end='', file=stdout)
 " "Python source code to get templates.")
 
 (defvar djangonaut-get-template-tags-code "
 from importlib import import_module
 from inspect import findsource, getsourcefile
-from json import dumps
 
 try:
     from inspect import unwrap
@@ -482,7 +433,7 @@ except ImportError:
             func = func.__wrapped__
         return func
 
-libraries = {}
+libraries = collections.OrderedDict()
 libraries['builtin'] = import_module('django.template.defaulttags').register
 
 try:
@@ -502,26 +453,23 @@ except ImportError:
                 if hasattr(module, 'register'):
                     libraries[entry[1][len(package_name) + 1:]] = module.register
 
-template_tags = {}
 for library_name, library in libraries.items():
     for tag_name, tag in library.tags.items():
         tag = unwrap(tag)
         try:
-            template_tags[library_name + '.' + tag_name] = [getsourcefile(tag), findsource(tag)[1]]
+            result[library_name + '.' + tag_name] = [getsourcefile(tag), findsource(tag)[1]]
         except TypeError:
             # This is Django 1.8 and we met functools.partial result.  We take class defined
             # in the decorator from bound keyword arguments.  This class has a method with a
             # closure where we can find decorated function.
             tag = tag.keywords['node_class'].render.__closure__[-1].cell_contents
-            template_tags[library_name + '.' + tag_name] = [getsourcefile(tag), findsource(tag)[1]]
+            result[library_name + '.' + tag_name] = [getsourcefile(tag), findsource(tag)[1]]
 
-print(dumps(template_tags), end='', file=stdout)
 " "Python source code to get template tags.")
 
 (defvar djangonaut-get-template-filters-code "
 from importlib import import_module
 from inspect import findsource, getsourcefile
-from json import dumps
 
 try:
     from inspect import unwrap
@@ -531,7 +479,7 @@ except ImportError:
             func = func.__wrapped__
         return func
 
-libraries = {}
+libraries = collections.OrderedDict()
 libraries['builtin'] = import_module('django.template.defaulttags').register
 
 try:
@@ -551,28 +499,22 @@ except ImportError:
                 if hasattr(module, 'register'):
                     libraries[entry[1][len(package_name) + 1:]] = module.register
 
-template_filters = {}
 for library_name, library in libraries.items():
     for filter_name, filter in library.filters.items():
         filter = unwrap(filter)
-        template_filters[library_name + '.' + filter_name] = [getsourcefile(filter), findsource(filter)[1]]
+        result[library_name + '.' + filter_name] = [getsourcefile(filter), findsource(filter)[1]]
 
-print(dumps(template_filters), end='', file=stdout)
 " "Python source code to get template filters.")
 
 (defvar djangonaut-get-static-files-code "
-from json import dumps
-
 from django.contrib.staticfiles.finders import get_finders
 
 ignore_patterns = ['CVS', '.*', '*~']
 
-staticfiles = {}
 for finder in get_finders():
     for path, storage in finder.list(ignore_patterns):
-        staticfiles.setdefault(path, storage.path(path))
+        result.setdefault(path, storage.path(path))
 
-print(dumps(staticfiles), end='', file=stdout)
 " "Python source code to get static files.")
 
 (defvar djangonaut-get-settings-path-code "
@@ -584,13 +526,13 @@ settings_module = environ['DJANGO_SETTINGS_MODULE']
 module = import_module(settings_module)
 settings_path = getsourcefile(module)
 
-print(settings_path, end='', file=stdout)
+result['settings_path'] = settings_path
 " "Python source code to get settings path.")
 
 (defvar djangonaut-wrapper-template "
 from __future__ import print_function
 
-import os, sys, traceback
+import collections, json, os, sys, traceback
 stdout = sys.stdout
 sys.stdout = open(os.devnull, 'w')
 sys.stderr = open(os.devnull, 'w')
@@ -600,7 +542,11 @@ try:
     from django.conf import settings
     apps.populate(settings.INSTALLED_APPS)
 
+    result = collections.OrderedDict()
+
     %s
+
+    print(json.dumps(result), end='', file=stdout)
 except:
     traceback.print_exc(None, stdout)
     raise
@@ -661,7 +607,7 @@ except:
                              :args (list "-c" djangonaut-get-project-root-code)))))
 
 (defun djangonaut-wrap (code)
-  "Wrap code with try/except code block."
+  "Wrap code with try/except CODE block."
   (format djangonaut-wrapper-template
           (s-join "\n    " (s-split "\n" code))))
 
@@ -675,7 +621,9 @@ except:
               (hack-dir-local-variables-non-file-buffer)
               (setq exit-code
                     (pythonic-call-process :buffer standard-output
-                                           :args (append (list "-c" (djangonaut-wrap code)) args))))))
+                                           :args `("-c"
+                                                   ,(djangonaut-wrap code)
+                                                   ,@args))))))
     (when (not (zerop exit-code))
       (djangonaut-show-error output (format "Python exit with status code %d" exit-code)))
     output))
@@ -683,7 +631,8 @@ except:
 (defun djangonaut-read (str)
   "Read JSON from Python process output STR."
   (condition-case err
-      (let ((result (json-read-from-string str)))
+      (let* ((json-key-type 'string)
+             (result (json-read-from-string str)))
         (unless (listp result)
           (signal 'json-error nil))
         result)
@@ -711,7 +660,7 @@ except:
 
 FUNC is function to open file.  PROMPT and COLLECTION stands for
 user input.  HIST is a variable to store history of choices."
-  (let* ((key (intern (completing-read prompt (mapcar 'symbol-name (mapcar 'car collection)) nil t nil hist)))
+  (let* ((key (completing-read prompt (mapcar 'car collection) nil t nil hist))
          (value (cdr (assoc key collection))))
     (apply func (pythonic-emacs-readable-file-name value) nil)))
 
@@ -720,7 +669,7 @@ user input.  HIST is a variable to store history of choices."
 
 FUNC is function to open file.  PROMPT and COLLECTION stands for
 user input.  HIST is a variable to store history of choices."
-  (let* ((key (intern (completing-read prompt (mapcar 'symbol-name (mapcar 'car collection)) nil t nil hist)))
+  (let* ((key (completing-read prompt (mapcar 'car collection) nil t nil hist))
          (code (cdr (assoc key collection)))
          (value (elt code 0))
          (lineno (elt code 1)))
@@ -731,8 +680,7 @@ user input.  HIST is a variable to store history of choices."
 
 (defun djangonaut-get-commands ()
   "Execute and parse python code to get commands."
-  (let ((json-array-type 'list))
-    (djangonaut-read (djangonaut-call djangonaut-get-commands-code))))
+  (mapcar 'car (djangonaut-read (djangonaut-call djangonaut-get-commands-code))))
 
 (defun djangonaut-get-command-definitions ()
   "Execute and parse python code to get command definitions."
@@ -808,7 +756,7 @@ user input.  HIST is a variable to store history of choices."
 
 (defun djangonaut-get-settings-path ()
   "Execute and parse python code to get settings path."
-  (djangonaut-call djangonaut-get-settings-path-code))
+  (cdar (djangonaut-read (djangonaut-call djangonaut-get-settings-path-code))))
 
 (defun djangonaut-run-management-command-dwim ()
   "Run management command."
@@ -847,9 +795,9 @@ user input.  HIST is a variable to store history of choices."
          (args-name (intern (concat "djangonaut-run-" (s-replace "_" "-" command) "-arguments")))
          (popup `(magit-define-popup ,func-name ""
                    :switches ',(mapcar (lambda (x) (list (elt (elt x 0) 0) (elt x 1) (elt x 2)))
-                                       (cdr (assoc 'switches arguments)))
+                                       (cdr (assoc "switches" arguments)))
                    :options ',(mapcar (lambda (x) (list (elt (elt x 0) 0) (elt x 1) (elt x 2)))
-                                      (cdr (assoc 'options arguments)))
+                                      (cdr (assoc "options" arguments)))
                    :actions '((?\  "Run" (lambda ()
                                            (interactive)
                                            (apply 'djangonaut-run-management-command ,command (,args-name)))))))
