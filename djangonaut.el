@@ -333,6 +333,13 @@ def collect_views(resolver):
                 # DRF as_view result.
                 view = view.cls
                 name = getmodule(view).__name__ + '.' + view.__name__
+                result[name] = [getsourcefile(view), findsource(view)[1]]
+                for attrname in dir(view):
+                    view_attr = getattr(view, attrname)
+                    if getattr(view_attr, 'bind_to_methods', None):
+                        # DRF ViewSet method view.
+                        result[name + '.' + attrname] = [getsourcefile(view_attr), findsource(view_attr)[1]]
+                continue
             else:
                 view = unwrap(view)
                 if ismethod(view):
