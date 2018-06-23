@@ -1032,7 +1032,7 @@ user input.  HIST is a variable to store history of choices."
     (define-key map djangonaut-keymap-prefix djangonaut-command-map)
     map))
 
-(easy-menu-define djangonout-mode-menu djangonaut-mode-map
+(easy-menu-define djangonaut-mode-menu djangonaut-mode-map
   "Menu to interact with Django project."
   '("Django"
     ["Run management command" djangonaut-run-management-command
