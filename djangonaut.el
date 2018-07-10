@@ -395,6 +395,23 @@ collect_url_modules(get_resolver(get_urlconf()))
 
 " "Python source code to get url modules.")
 
+(defvar djangonaut-get-forms-code "
+from gc import get_objects
+from importlib import import_module
+from inspect import findsource, getsourcefile, getmodule, isclass
+
+from django.forms.forms import BaseForm
+from django.forms.formsets import BaseFormSet
+
+import_module(settings.ROOT_URLCONF)
+
+for obj in get_objects():
+    if isclass(obj) and issubclass(obj, (BaseForm, BaseFormSet)):
+        name = getmodule(obj).__name__ + '.' + obj.__name__
+        result[name] = [getsourcefile(obj), findsource(obj)[1]]
+
+" "Python source code to get forms.")
+
 (defvar djangonaut-get-templates-code "
 from os import walk
 from os.path import join
@@ -585,6 +602,8 @@ except:
 
 (defvar djangonaut-url-modules-history nil)
 
+(defvar djangonaut-forms-history nil)
+
 (defvar djangonaut-templates-history nil)
 
 (defvar djangonaut-template-tags-history nil)
@@ -744,6 +763,10 @@ user input.  HIST is a variable to store history of choices."
 (defun djangonaut-get-url-modules ()
   "Execute and parse python code to get url modules."
   (djangonaut-read (djangonaut-call djangonaut-get-url-modules-code)))
+
+(defun djangonaut-get-forms ()
+  "Execute and parse python code to get forms."
+  (djangonaut-read (djangonaut-call djangonaut-get-forms-code)))
 
 (defun djangonaut-get-templates ()
   "Execute and parse python code to get templates."
@@ -941,6 +964,16 @@ user input.  HIST is a variable to store history of choices."
   (interactive)
   (djangonaut-find-file #'find-file-other-window "URL Module: " (djangonaut-get-url-modules) 'djangonaut-url-modules-history))
 
+(defun djangonaut-find-form ()
+  "Open definition of the Django form."
+  (interactive)
+  (djangonaut-find-file-and-line #'find-file "Form: " (djangonaut-get-forms) 'djangonaut-forms-history))
+
+(defun djangonaut-find-form-other-window ()
+  "Open definition of the Django form in the other window."
+  (interactive)
+  (djangonaut-find-file-and-line #'find-file-other-window "Form: " (djangonaut-get-forms) 'djangonaut-forms-history))
+
 (defun djangonaut-find-template ()
   "Open definition of the Django template."
   (interactive)
@@ -1009,6 +1042,7 @@ user input.  HIST is a variable to store history of choices."
     (define-key map (kbd "v") 'djangonaut-find-view)
     (define-key map (kbd "d") 'djangonaut-find-middleware)
     (define-key map (kbd "u") 'djangonaut-find-url-module)
+    (define-key map (kbd "f") 'djangonaut-find-form)
     (define-key map (kbd "t") 'djangonaut-find-template)
     (define-key map (kbd "g") 'djangonaut-find-template-tag)
     (define-key map (kbd "h") 'djangonaut-find-template-filter)
@@ -1027,6 +1061,7 @@ user input.  HIST is a variable to store history of choices."
     (define-key map (kbd "4 v") 'djangonaut-find-view-other-window)
     (define-key map (kbd "4 d") 'djangonaut-find-middleware-other-window)
     (define-key map (kbd "4 u") 'djangonaut-find-url-module-other-window)
+    (define-key map (kbd "4 f") 'djangonaut-find-form-other-window)
     (define-key map (kbd "4 t") 'djangonaut-find-template-other-window)
     (define-key map (kbd "4 g") 'djangonaut-find-template-tag-other-window)
     (define-key map (kbd "4 h") 'djangonaut-find-template-filter-other-window)
@@ -1072,6 +1107,8 @@ user input.  HIST is a variable to store history of choices."
      :help "Open definition of the Django middleware"]
     ["Find url module" djangonaut-find-url-module
      :help "Open definition of the Django url module"]
+    ["Find form" djangonaut-find-form
+     :help "Open definition of the Django form"]
     ["Find template" djangonaut-find-template
      :help "Open definition of the Django template"]
     ["Find template tag" djangonaut-find-template-tag
