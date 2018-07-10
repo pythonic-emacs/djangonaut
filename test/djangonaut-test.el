@@ -24,6 +24,8 @@
                 (djangonaut-get-views)
                 (djangonaut-get-middlewares)
                 (djangonaut-get-url-modules)
+                (djangonaut-get-forms)
+                (djangonaut-get-widgets)
                 (djangonaut-get-templates)
                 (djangonaut-get-template-tags)
                 (djangonaut-get-template-filters)
