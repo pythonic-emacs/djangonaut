@@ -145,7 +145,7 @@ For example, open `/docker:root@container:/code/manage.py` instead of
 | <kbd>C-c ' S</kbd>   | djangonaut-find-settings-module    |
 | <kbd>C-c ' a</kbd>   | djangonaut-find-admin-class        |
 | <kbd>C-c ' c</kbd>   | djangonaut-find-management-command |
-| <kbd>C-c ' f</kbd>   | djangonaut-find-template-filter    |
+| <kbd>C-c ' h</kbd>   | djangonaut-find-template-filter    |
 | <kbd>C-c ' g</kbd>   | djangonaut-find-template-tag       |
 | <kbd>C-c ' i</kbd>   | djangonaut-dired-installed-apps    |
 | <kbd>C-c ' j</kbd>   | djangonaut-find-static-file        |
