@@ -577,6 +577,9 @@ stdout = sys.stdout
 sys.stdout = open(os.devnull, 'w')
 sys.stderr = open(os.devnull, 'w')
 
+if not sys.path[0]:
+    del sys.path[0]
+
 try:
     from django.apps import apps
     from django.conf import settings
