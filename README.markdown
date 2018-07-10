@@ -156,6 +156,7 @@ For example, open `/docker:root@container:/code/manage.py` instead of
 | <kbd>C-c ' r</kbd>   | djangonaut-find-signal-receiver    |
 | <kbd>C-c ' s</kbd>   | djangonaut-find-drf-serializer     |
 | <kbd>C-c ' f</kbd>   | djangonaut-find-form               |
+| <kbd>C-c ' w</kbd>   | djangonaut-find-widget             |
 | <kbd>C-c ' t</kbd>   | djangonaut-find-template           |
 | <kbd>C-c ' u</kbd>   | djangonaut-find-url-module         |
 | <kbd>C-c ' v</kbd>   | djangonaut-find-view               |
