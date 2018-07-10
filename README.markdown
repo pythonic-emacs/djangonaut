@@ -158,7 +158,7 @@ For example, open `/docker:root@container:/code/manage.py` instead of
 | <kbd>C-c ' t</kbd>   | djangonaut-find-template           |
 | <kbd>C-c ' u</kbd>   | djangonaut-find-url-module         |
 | <kbd>C-c ' v</kbd>   | djangonaut-find-view               |
-| <kbd>C-c ' w</kbd>   | djangonaut-find-middleware         |
+| <kbd>C-c ' d</kbd>   | djangonaut-find-middleware         |
 
 All navigation commands can open definitions in the other window.  For
 example use <kbd>C-c ' 4 m</kbd> to open model definition in the other
