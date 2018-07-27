@@ -1268,7 +1268,7 @@ call_command('migrate')
     (when migration
       ;; FIXME: Copy-pasted from `djangonaut-find-file-and-line'.
       (let* ((value (caar migration))
-             (lineno (cadr migration)))
+             (lineno (cdar migration)))
         (apply #'find-file (pythonic-emacs-readable-file-name value) nil)
         (goto-char (point-min))
         (forward-line lineno)
@@ -1283,7 +1283,7 @@ call_command('migrate')
     (when migration
       ;; FIXME: Copy-pasted from `djangonaut-find-file-and-line'.
       (let* ((value (caar migration))
-             (lineno (cadr migration)))
+             (lineno (cdar migration)))
         (apply #'find-file (pythonic-emacs-readable-file-name value) nil)
         (goto-char (point-min))
         (forward-line lineno)
