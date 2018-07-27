@@ -912,12 +912,14 @@ user input.  HIST is a variable to store history of choices."
 (defun djangonaut-find-migration ()
   "Open definition of the Django migration."
   (interactive)
-  (djangonaut-find-file-and-line #'find-file "Migration: " (djangonaut-get-migrations) 'djangonaut-migrations-history))
+  (djangonaut-find-file-and-line #'find-file "Migration: " (djangonaut-get-migrations) 'djangonaut-migrations-history)
+  (djangonaut-migration-mode +1))
 
 (defun djangonaut-find-migration-other-window ()
   "Open definition of the Django migration in the other window."
   (interactive)
-  (djangonaut-find-file-and-line #'find-file-other-window "Migration: " (djangonaut-get-migrations) 'djangonaut-migrations-history))
+  (djangonaut-find-file-and-line #'find-file-other-window "Migration: " (djangonaut-get-migrations) 'djangonaut-migrations-history)
+  (djangonaut-migration-mode +1))
 
 (defun djangonaut-find-sql-function ()
   "Open definition of the Django sql function."
@@ -1180,6 +1182,156 @@ user input.  HIST is a variable to store history of choices."
                       (f-ancestor-of? path directory))
               (djangonaut-mode 1)))))))
   :require 'djangonaut)
+
+(defvar djangonaut-get-previous-migration-code "
+from inspect import getsourcefile, findsource
+
+from django.db.migrations.loader import MigrationLoader
+
+loader = MigrationLoader(connection=None, load=False)
+loader.load_disk()
+
+for (label, module_name), migration in sorted(loader.disk_migrations.items()):
+    Migration = migration.__class__
+    migration_file = getsourcefile(Migration)
+    if migration_file == sys.argv[-1]:
+        dependencies = [loader.disk_migrations[i] for i in Migration.dependencies]
+        files = {getsourcefile(dep.__class__): dep.__class__ for dep in dependencies}
+        longest = max(files, key=lambda x: len(os.path.commonprefix([migration_file, x])))
+        dependency = files[longest]
+        result[getsourcefile(dependency)] = findsource(dependency)[1]
+        break
+
+" "Python source code to get previous migration file.")
+
+(defvar djangonaut-get-next-migration-code "
+from inspect import getsourcefile, findsource
+
+from django.db.migrations.loader import MigrationLoader
+
+loader = MigrationLoader(connection=None, load=False)
+loader.load_disk()
+
+for (label, module_name), migration in sorted(loader.disk_migrations.items()):
+    Migration = migration.__class__
+    migration_file = getsourcefile(Migration)
+    if migration_file == sys.argv[-1]:
+        have_dependency = [other for other in loader.disk_migrations.values() if (label, module_name) in other.dependencies]
+        files = {getsourcefile(other.__class__): other.__class__ for other in have_dependency}
+        longest = max(files, key=lambda x: len(os.path.commonprefix([migration_file, x])))
+        parent = files[longest]
+        result[getsourcefile(parent)] = findsource(parent)[1]
+        break
+
+" "Python source code to get next migration file.")
+
+(defvar djangonaut-rerun-migration-code "
+from __future__ import print_function
+
+from django.apps import apps
+from django.conf import settings
+apps.populate(settings.INSTALLED_APPS)
+
+import sys
+from inspect import getsourcefile
+
+from django.core.management import call_command
+from django.db.migrations.loader import MigrationLoader
+
+loader = MigrationLoader(connection=None, load=False)
+loader.load_disk()
+
+for (label, module_name), migration in sorted(loader.disk_migrations.items()):
+    Migration = migration.__class__
+    if getsourcefile(Migration) == sys.argv[-1]:
+        for app_name, migration_name in Migration.dependencies:
+            call_command('migrate', app_name, migration_name)
+        break
+
+call_command('migrate')
+
+" "Python source code to rerun migration file.")
+
+(defun djangonaut-get-previous-migration (filename)
+  "Execute and parse python code to get previous migration FILENAME."
+  (djangonaut-read (djangonaut-call djangonaut-get-previous-migration-code filename)))
+
+(defun djangonaut-get-next-migration (filename)
+  "Execute and parse python code to get next migration FILENAME."
+  (djangonaut-read (djangonaut-call djangonaut-get-next-migration-code filename)))
+
+(defun djangonaut-find-previous-migration (filename)
+  ""
+  (interactive (list (buffer-file-name)))
+  (let ((migration (djangonaut-get-previous-migration
+                    (pythonic-python-readable-file-name filename))))
+    (when migration
+      ;; FIXME: Copy-pasted from `djangonaut-find-file-and-line'.
+      (let* ((value (caar migration))
+             (lineno (cadr migration)))
+        (apply #'find-file (pythonic-emacs-readable-file-name value) nil)
+        (goto-char (point-min))
+        (forward-line lineno)
+        (run-hooks 'djangonaut-navigate-line-hook)
+        (djangonaut-migration-mode +1)))))
+
+(defun djangonaut-find-next-migration (filename)
+  ""
+  (interactive (list (buffer-file-name)))
+  (let ((migration (djangonaut-get-next-migration
+                    (pythonic-python-readable-file-name filename))))
+    (when migration
+      ;; FIXME: Copy-pasted from `djangonaut-find-file-and-line'.
+      (let* ((value (caar migration))
+             (lineno (cadr migration)))
+        (apply #'find-file (pythonic-emacs-readable-file-name value) nil)
+        (goto-char (point-min))
+        (forward-line lineno)
+        (run-hooks 'djangonaut-navigate-line-hook)
+        (djangonaut-migration-mode +1)))))
+
+(defun djangonaut-rerun-current-migration (filename)
+  "Reapply migration from the FILENAME."
+  (interactive (list (buffer-file-name)))
+  ;; FIXME: Copy-pasted from run command.
+  (let* ((buffer (get-buffer-create "*Django*"))
+         (process (get-buffer-process buffer)))
+    (when (and process (process-live-p process))
+      (setq buffer (generate-new-buffer "*Django*")))
+    (with-current-buffer buffer
+      (hack-dir-local-variables-non-file-buffer)
+      (pythonic-start-process :process "djangonaut"
+                              :buffer buffer
+                              :args (list "-c" djangonaut-rerun-migration-code (pythonic-python-readable-file-name filename))
+                              :cwd (pythonic-emacs-readable-file-name (djangonaut-get-project-root))
+                              :filter (lambda (process string)
+                                        (comint-output-filter process (ansi-color-apply string))))
+      (let ((inhibit-read-only t))
+        (erase-buffer))
+      (comint-mode)
+      (setq-local comint-prompt-read-only t)
+      (pop-to-buffer buffer))))
+
+(defvar djangonaut-migration-command-map
+  (let ((map (make-sparse-keymap)))
+    (define-key map (kbd "<") 'djangonaut-find-previous-migration)
+    (define-key map (kbd ">") 'djangonaut-find-next-migration)
+    (define-key map (kbd "@") 'djangonaut-rerun-current-migration)
+    map))
+
+(defvar djangonaut-migration-mode-map
+  (let ((map (make-sparse-keymap)))
+    (define-key map djangonaut-keymap-prefix djangonaut-migration-command-map)
+    map))
+
+(defvar djangonaut-migration-mode-lighter "")
+
+(define-minor-mode djangonaut-migration-mode
+  "Minor mode to interact with Django migration modules.
+
+\\{djangonaut-migration-mode-map}"
+  :lighter djangonaut-migration-mode-lighter
+  :keymap djangonaut-migration-mode-map)
 
 (provide 'djangonaut)
 

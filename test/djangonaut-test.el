@@ -30,7 +30,12 @@
                 (djangonaut-get-template-tags)
                 (djangonaut-get-template-filters)
                 (djangonaut-get-static-files)
-                (djangonaut-get-settings-path)))
+                (djangonaut-get-settings-path)
+                ;; FIXME: Test
+                ;; `djangonaut-get-previous-migration-code',
+                ;; `djangonaut-get-next-migration-code' and
+                ;; `djangonaut-rerun-migration-code'.
+                ))
   (let* ((name (format "test-%s" (car args)))
          (symbol (intern name)))
     (eval
