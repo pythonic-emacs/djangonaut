@@ -129,6 +129,17 @@ directly or with compose file environment key
 
     docker run -e DJANGO_SETTINGS_MODULE=project.settings web ...
 
+### Configuration via .dir-locals.el
+
+Another way to set the above variables is via [directory variables](https://www.gnu.org/software/emacs/manual/html_node/emacs/Directory-Variables.html). The values you set will then be valid when editing all files in the directory where `.dir-locals.el` is located and all directories underneath that one. To set the same values as in the examples above, we would use the following `.dir-locals.el` file:
+
+	((nil
+	  (python-shell-process-environment . ("DJANGO_SETTINGS_MODULE=project.settings"))
+	  (python-shell-extra-pythonpaths . ("/path/to/the/project/"))
+	  (python-shell-virtualenv-root . "/path/to/your/venv/")))
+
+Note that you should specify `nil` for the major-mode specification in the directory variables, indicating that the values will be valid in all Emacs buffers associated with files under the directory, not just, say, buffers of open Python files.
+
 ## Usage
 
 If you open file or directory related to the project, you should see
