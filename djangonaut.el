@@ -92,7 +92,13 @@ from django.core.management import get_commands
 for command_name, module_name in get_commands().items():
     module = import_module(module_name + '.management.commands.' + command_name)
     command = module.Command
-    result[command_name] = [getsourcefile(command), findsource(command)[1]]
+    try:
+        source = findsource(command)
+    except OSError:
+        pass
+    else:
+        result[command_name] = [getsourcefile(command), source[1]]
+
 
 " "Python source code to get command definitions.")
 
@@ -185,7 +191,12 @@ except ImportError:
 for site in all_sites:
     for admin_instance in site._registry.values():
         admin_class = admin_instance.__class__
-        result[str(admin_instance)] = [getsourcefile(admin_class), findsource(admin_class)[1]]
+        try:
+            source = findsource(admin_class)
+        except OSError:
+            pass
+        else:
+            result[str(admin_instance)] = [getsourcefile(admin_class), source[1]]
 
 " "Python source code to get admin classes.")
 
@@ -193,7 +204,12 @@ for site in all_sites:
 from inspect import findsource, getsourcefile
 
 for model in apps.get_models():
-    result[model._meta.app_label + '.' + model.__name__] = [getsourcefile(model), findsource(model)[1]]
+    try:
+        source = findsource(model)
+    except OSError:
+        pass
+    else:
+        result[model._meta.app_label + '.' + model.__name__] = [getsourcefile(model), source[1]]
 
 " "Python source code to get models.")
 
@@ -206,7 +222,12 @@ from django.db.models import Manager
 for obj in get_objects():
     if isclass(obj) and issubclass(obj, Manager):
         name = getmodule(obj).__name__ + '.' + obj.__name__
-        result[name] = [getsourcefile(obj), findsource(obj)[1]]
+        try:
+            source = findsource(obj)
+        except OSError:
+            pass
+        else:
+            result[name] = [getsourcefile(obj), source[1]]
 
 " "Python source code to get model managers.")
 
@@ -221,7 +242,12 @@ loader.load_disk()
 for (label, module_name), migration in sorted(loader.disk_migrations.items()):
     name = label + '.' + module_name
     Migration = migration.__class__
-    result[name] = [getsourcefile(Migration), findsource(Migration)[1]]
+    try:
+        source = findsource(Migration)
+    except OSError:
+        pass
+    else:
+        result[name] = [getsourcefile(Migration), source[1]]
 
 " "Python source code to get migrations.")
 
@@ -234,7 +260,12 @@ from django.db.models import Func
 for obj in get_objects():
     if isclass(obj) and issubclass(obj, Func):
         name = getmodule(obj).__name__ + '.' + obj.__name__
-        result[name] = [getsourcefile(obj), findsource(obj)[1]]
+        try:
+            source = findsource(obj)
+        except OSError:
+            pass
+        else:
+            result[name] = [getsourcefile(obj), source[1]]
 
 " "Python source code to get sql functions.")
 
@@ -253,7 +284,12 @@ for obj in get_objects():
                 if receiver is None:
                     continue
             name = getmodule(receiver).__name__ + '.' + receiver.__name__
-            result[name] = [getsourcefile(receiver), findsource(receiver)[1]]
+            try:
+                source = findsource(receiver)
+            except OSError:
+                pass
+            else:
+                result[name] = [getsourcefile(receiver), source[1]]
 
 " "Python source code to get signal receivers.")
 
@@ -269,7 +305,12 @@ import_module(settings.ROOT_URLCONF)
 for obj in get_objects():
     if isclass(obj) and issubclass(obj, Serializer):
         name = getmodule(obj).__name__ + '.' + obj.__name__
-        result[name] = [getsourcefile(obj), findsource(obj)[1]]
+        try:
+            source = findsource(obj)
+        except OSError:
+            pass
+        else:
+            result[name] = [getsourcefile(obj), source[1]]
 
 " "Python source code to get drf serializers.")
 
@@ -285,7 +326,12 @@ import_module(settings.ROOT_URLCONF)
 for obj in get_objects():
     if isclass(obj) and issubclass(obj, BasePermission):
         name = getmodule(obj).__name__ + '.' + obj.__name__
-        result[name] = [getsourcefile(obj), findsource(obj)[1]]
+        try:
+            source = findsource(obj)
+        except OSError:
+            pass
+        else:
+            result[name] = [getsourcefile(obj), source[1]]
 
 " "Python source code to get drf permissions.")
 
@@ -333,12 +379,22 @@ def collect_views(resolver):
                 # DRF as_view result.
                 view = view.cls
                 name = getmodule(view).__name__ + '.' + view.__name__
-                result[name] = [getsourcefile(view), findsource(view)[1]]
+                try:
+                    source = findsource(view)
+                except OSError:
+                    pass
+                else:
+                    result[name] = [getsourcefile(view), source[1]]
                 for attrname in dir(view):
                     view_attr = getattr(view, attrname)
                     if getattr(view_attr, 'bind_to_methods', None):
                         # DRF ViewSet method view.
-                        result[name + '.' + attrname] = [getsourcefile(view_attr), findsource(view_attr)[1]]
+                        try:
+                            source = findsource(view_attr)
+                        except OSError:
+                            pass
+                        else:
+                            result[name + '.' + attrname] = [getsourcefile(view_attr), source[1]]
                 continue
             else:
                 view = unwrap(view)
@@ -346,7 +402,12 @@ def collect_views(resolver):
                     name = getmodule(view).__name__ + '.' + view.__self__.__class__.__name__ + '.' + view.__name__
                 else:
                     name = getmodule(view).__name__ + '.' + view.__name__
-            result[name] = [getsourcefile(view), findsource(view)[1]]
+            try:
+                source = findsource(view)
+            except OSError:
+                pass
+            else:
+                result[name] = [getsourcefile(view), source[1]]
 
 collect_views(get_resolver(get_urlconf()))
 
@@ -359,7 +420,12 @@ from django.utils.module_loading import import_string
 
 for name in getattr(settings, 'MIDDLEWARE', None) or settings.MIDDLEWARE_CLASSES:
     middleware = import_string(name)
-    result[name] = [getsourcefile(middleware), findsource(middleware)[1]]
+    try:
+        source = findsource(middleware)
+    except OSError:
+        pass
+    else:
+        result[name] = [getsourcefile(middleware), source[1]]
 
 " "Python source code to get middlewares.")
 
@@ -408,7 +474,12 @@ import_module(settings.ROOT_URLCONF)
 for obj in get_objects():
     if isclass(obj) and issubclass(obj, (BaseForm, BaseFormSet)):
         name = getmodule(obj).__name__ + '.' + obj.__name__
-        result[name] = [getsourcefile(obj), findsource(obj)[1]]
+        try:
+            source = findsource(obj)
+        except OSError:
+            pass
+        else:
+            result[name] = [getsourcefile(obj), source[1]]
 
 " "Python source code to get forms.")
 
@@ -424,7 +495,12 @@ import_module(settings.ROOT_URLCONF)
 for obj in get_objects():
     if isclass(obj) and issubclass(obj, Widget):
         name = getmodule(obj).__name__ + '.' + obj.__name__
-        result[name] = [getsourcefile(obj), findsource(obj)[1]]
+        try:
+            source = findsource(obj)
+        except OSError:
+            pass
+        else:
+            result[name] = [getsourcefile(obj), source[1]]
 
 " "Python source code to get widgets.")
 
@@ -497,13 +573,23 @@ for library_name, library in libraries.items():
     for tag_name, tag in library.tags.items():
         tag = unwrap(tag)
         try:
-            result[library_name + '.' + tag_name] = [getsourcefile(tag), findsource(tag)[1]]
+            try:
+                source = findsource(tag)
+            except OSError:
+                pass
+            else:
+                result[library_name + '.' + tag_name] = [getsourcefile(tag), source[1]]
         except TypeError:
             # This is Django 1.8 and we met functools.partial result.  We take class defined
             # in the decorator from bound keyword arguments.  This class has a method with a
             # closure where we can find decorated function.
             tag = tag.keywords['node_class'].render.__closure__[-1].cell_contents
-            result[library_name + '.' + tag_name] = [getsourcefile(tag), findsource(tag)[1]]
+            try:
+                source = findsource(tag)
+            except OSError:
+                pass
+            else:
+                result[library_name + '.' + tag_name] = [getsourcefile(tag), source[1]]
 
 " "Python source code to get template tags.")
 
@@ -542,7 +628,12 @@ except ImportError:
 for library_name, library in libraries.items():
     for filter_name, filter in library.filters.items():
         filter = unwrap(filter)
-        result[library_name + '.' + filter_name] = [getsourcefile(filter), findsource(filter)[1]]
+        try:
+            source = findsource(filter)
+        except OSError:
+            pass
+        else:
+            result[library_name + '.' + filter_name] = [getsourcefile(filter), source[1]]
 
 " "Python source code to get template filters.")
 
