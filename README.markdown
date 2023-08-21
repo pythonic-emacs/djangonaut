@@ -2,6 +2,8 @@
 
 Emacs minor mode for Django.
 
+[![MELPA](https://melpa.org/packages/djangonaut-badge.svg)](https://melpa.org/#/djangonaut)
+
 This package is based on the introspection of your Django project.  It
 executes Python code to get all necessary information about model,
 views, and templates inside `INSTALLED_APPS`.  Works the same way for
