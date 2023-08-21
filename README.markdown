@@ -3,6 +3,7 @@
 Emacs minor mode for Django.
 
 [![MELPA](https://melpa.org/packages/djangonaut-badge.svg)](https://melpa.org/#/djangonaut)
+[![CI](https://github.com/pythonic-emacs/djangonaut/actions/workflows/test.yml/badge.svg)](https://github.com/pythonic-emacs/djangonaut/actions/workflows/test.yml)
 
 This package is based on the introspection of your Django project.  It
 executes Python code to get all necessary information about model,
