@@ -26,3 +26,9 @@ ${MANAGE_PY}:
 	test -n "${ENVSITEPACKAGESDIR}"
 	env -u DJANGO_SETTINGS_MODULE django-admin startproject testproject ${ENVSITEPACKAGESDIR}
 	touch $@
+
+ci:
+	eask clean all
+	eask package
+	eask install
+	eask compile
