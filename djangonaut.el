@@ -673,6 +673,12 @@ if not sys.path[0]:
     del sys.path[0]
 
 try:
+    import dotenv
+    dotenv.load_dotenv()
+except ModuleNotFoundError:
+    pass
+
+try:
     from django.apps import apps
     from django.conf import settings
     apps.populate(settings.INSTALLED_APPS)
