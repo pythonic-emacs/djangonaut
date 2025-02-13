@@ -5,3 +5,6 @@
 testproject/
 .tox/
 *.elc
+
+# OS generated
+.DS_Store
