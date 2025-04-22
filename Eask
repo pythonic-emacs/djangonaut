@@ -1,3 +1,5 @@
+;; -*- mode: eask; lexical-binding: t -*-
+
 (package "djangonaut"
          "0.0.1"
          "Minor mode to interact with Django projects")
